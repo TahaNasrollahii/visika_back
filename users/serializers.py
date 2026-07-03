@@ -32,7 +32,7 @@ class OTPLoginSerializer(serializers.Serializer):
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(source="role.name", allow_null=True)
+    groups = serializers.SerializerMethodField()
     
     class Meta:
         model = User
@@ -43,6 +43,9 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "last_name",
             "full_name",
             "status",
-            "role",
+            "groups",
             "is_phone_verified",
         )
+
+    def get_groups(self, obj):
+        return obj.groups.values_list("name", flat=True)

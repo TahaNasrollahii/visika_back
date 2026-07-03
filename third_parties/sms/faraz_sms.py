@@ -1,24 +1,29 @@
 import requests
 import os
-from django.core.exceptions import ValidationError
+from django.conf import settings
+from rest_framework.exceptions import APIException
 
+
+class SMSProviderException(APIException):
+    status_code = 502
+    default_detail = "SMS Provider failed to process the request."
+    default_code = "sms_provider_error"
 
 
 class SMSHandler:
     BASE_URL = "https://edge.ippanel.com/v1"
     
     def __init__(self):
-        self.api_key = os.getenv("FARAZ_SMS_API_KEY", None)
-        self.sender_number = os.getenv("FARAZ_SMS_SENDER_NUMBER", None)
-        self.login_otp_pattern_code = os.getenv("FARAZ_SMS_LOGIN_OTP_PATTERN_CODE", None)
-        self.phone_book_id = os.getenv("FARAZ_SMS_PHONE_BOOK_ID", None)
+        self.api_key = getattr(settings, "FARAZ_SMS_API_KEY", "")
+        self.sender_number = getattr(settings, "FARAZ_SMS_SENDER_NUMBER", "")
+        self.login_otp_pattern_code = getattr(settings, "FARAZ_SMS_LOGIN_OTP_PATTERN_CODE", "")
         self.validate_env_config() 
             
     def validate_env_config(self):
-        required_fields = ("api_key", "sender_number", "login_otp_pattern_code", "phone_book_id")
+        required_fields = ("api_key", "sender_number", "login_otp_pattern_code")
         for field in required_fields:
-            if getattr(self, field) is None:
-                raise EnvironmentError(f"Faraz sms {field} is not properly set.")
+            if not getattr(self, field):
+                raise ValueError(f"Faraz sms {field} is not properly set in settings.")
     
     def get_headers(self):
         return {
@@ -27,23 +32,21 @@ class SMSHandler:
         }
         
     def send_request(self, method, url, headers, body):
-        response = requests.request(
-            url=url,
-            method=method,
-            headers=headers,
-            json=body,
-        )
-        if not (200 <= response.status_code <300):
-            raise ValidationError(
-                f"Failed to send request to faraz sms, status: {response.status_code},"
-                f"body: {response.json()}"
+        try:
+            response = requests.request(
+                url=url,
+                method=method,
+                headers=headers,
+                json=body,
+                timeout=10,
             )
-            
-        return response.json()
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            # Re-raise as custom exception to allow celery to retry
+            raise SMSProviderException(f"Failed to communicate with SMS provider: {e}")
     
     def send_sms_with_pattern(self, recipient_phone_number, otp_code):
-        # TODO: validate phone_number
-        # TODO: add name to phone book
         url = f"{self.BASE_URL}/api/send"
         headers = self.get_headers()
         body = {
@@ -52,13 +55,6 @@ class SMSHandler:
             "code": self.login_otp_pattern_code,
             "recipients": [recipient_phone_number],
             "params": {"verification-code": otp_code,},
-            "phonebook": {
-                "id": self.phone_book_id,
-                "name": "علیرضا",
-                "pre": "mr",
-                "email": "saeed@gmail.com",
-                "options": {"456": "1970/01/01"}
-            }
         }
         return self.send_request(
             method="POST",
@@ -66,4 +62,3 @@ class SMSHandler:
             headers=headers,
             body=body,
         )
-        

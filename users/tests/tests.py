@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from users.services import OTPService, UserService
+
 User = get_user_model()
 pytestmark = pytest.mark.django_db
 
@@ -15,7 +17,7 @@ class TestOTPAuth:
         fixed_otp = "1234"
 
         # Mock OTP generator
-        monkeypatch.setattr("users.views.generate_otp", lambda length=4: fixed_otp)
+        monkeypatch.setattr("users.services.OTPService.generate_otp", lambda length=4: fixed_otp)
 
         # Mock celery delay
         called = {"ok": False, "args": None}
@@ -24,7 +26,7 @@ class TestOTPAuth:
             called["ok"] = True
             called["args"] = (p, o)
 
-        monkeypatch.setattr("users.views.send_otp_sms.delay", fake_delay)
+        monkeypatch.setattr("users.services.send_otp_sms.delay", fake_delay)
 
         res = api_client.post(
             "/users/otp/request/",
@@ -41,7 +43,7 @@ class TestOTPAuth:
         phone = "+989121234567"
         otp = "1234"
 
-        User.objects.create_user(phone_number=phone, password="x12345678")
+        UserService.create_user(phone_number=phone, password="x12345678")
         cache.set(f"otp_{phone}", otp, timeout=120)
 
         res = api_client.post(
@@ -55,17 +57,34 @@ class TestOTPAuth:
         assert "accessToken" in res.cookies
         assert "refreshToken" in res.cookies
 
+    def test_otp_login_fails_on_invalid_otp(self, api_client):
+        phone = "+989121234567"
+        otp = "1234"
+        wrong_otp = "9999"
+
+        UserService.create_user(phone_number=phone)
+        cache.set(f"otp_{phone}", otp, timeout=120)
+
+        res = api_client.post(
+            "/users/otp/login/",
+            data={"phone_number": phone, "otp": wrong_otp},
+            format="json"
+        )
+
+        assert res.status_code == 400
+        assert "error_code" in res.json()
+
 
 class TestUserInfo:
     def test_user_info_returns_data(self, api_client):
-        user = User.objects.create_user(phone_number="+989121234567", password="x12345678")
+        user = UserService.create_user(phone_number="+989121234567", password="x12345678")
 
         # Because in user-info we require ACTIVE
         user.status = User.StatusChoices.ACTIVE
         user.save(update_fields=["status"])
 
-        refresh = RefreshToken.for_user(user)
-        access = str(refresh.access_token)
+        tokens = UserService.get_tokens_for_user(user)
+        access = tokens["access"]
 
         api_client.cookies["accessToken"] = access
 
@@ -73,3 +92,20 @@ class TestUserInfo:
 
         assert res.status_code == 200
         assert res.json()["phone_number"] == "+989121234567"
+
+class TestServices:
+    def test_generate_otp_length(self):
+        otp = OTPService.generate_otp(length=6)
+        assert len(otp) == 6
+        assert otp.isdigit()
+
+    def test_verify_otp_consumes_cache(self):
+        phone = "+989121234567"
+        otp = "4321"
+        cache.set(f"otp_{phone}", otp, timeout=120)
+        
+        # Verify first time should work
+        assert OTPService.verify_otp(phone, otp) is True
+        
+        # Verify second time should fail (consumed)
+        assert OTPService.verify_otp(phone, otp) is False

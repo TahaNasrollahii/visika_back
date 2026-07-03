@@ -3,11 +3,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-class Role(models.Model):
-    name = models.CharField()
-    
-    def __str__(self):
-        return self.name
+from core.models import TimestampedModel
 
 class UserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields) -> "User":
@@ -33,7 +29,7 @@ class UserManager(BaseUserManager):
         return self.create_user(phone_number, password, **extra_fields)
 
 
-class User(AbstractUser):
+class User(AbstractUser, TimestampedModel):
     class GenderChoices(models.IntegerChoices):
         MALE = 1, _("Male")
         FEMALE = 2, _("Female")
@@ -58,7 +54,7 @@ class User(AbstractUser):
 
     gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True)
     is_phone_verified = models.BooleanField(_("is phone verified"), default=False)
-    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, related_name="users")
+
 
     objects = UserManager()  # type: ignore
 
