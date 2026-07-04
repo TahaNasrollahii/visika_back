@@ -56,6 +56,7 @@ class User(AbstractUser, TimestampedModel):
     is_phone_verified = models.BooleanField(_("is phone verified"), default=False)
     national_id = models.CharField(max_length=10, blank=True, null=True)
     birth_date = models.CharField(max_length=10, blank=True, null=True)
+    favorites = models.ManyToManyField('products.Product', related_name='favorited_by', blank=True)
 
 
     objects = UserManager()  # type: ignore

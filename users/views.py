@@ -116,3 +116,30 @@ class LogoutView(APIView):
         from users.utils import remove_tokens_from_cookie
         remove_tokens_from_cookie(response)
         return response
+
+from products.models import Product
+from products.serializers import ProductSerializer
+from rest_framework import generics
+
+class ToggleFavoriteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, product_id):
+        user = request.user
+        try:
+            product = Product.objects.get(id=product_id)
+            if user.favorites.filter(id=product_id).exists():
+                user.favorites.remove(product)
+                return Response({'status': 'removed', 'message': 'Removed from favorites'}, status=status.HTTP_200_OK)
+            else:
+                user.favorites.add(product)
+                return Response({'status': 'added', 'message': 'Added to favorites'}, status=status.HTTP_200_OK)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class FavoriteListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        return self.request.user.favorites.all()
