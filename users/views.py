@@ -7,7 +7,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from django.contrib.auth import get_user_model
 from rest_framework.throttling import ScopedRateThrottle
 
-from users.serializers import SignUpSerializer, OTPRequestSerializer, OTPLoginSerializer, UserInfoSerializer
+from users.serializers import SignUpSerializer, OTPRequestSerializer, OTPLoginSerializer, UserInfoSerializer, UpdateProfileSerializer
 from users.utils import set_tokens_on_cookie
 from users.services import OTPService, UserService
 
@@ -96,8 +96,14 @@ class UserInfoView(APIView):
     def get(self, request):
         user = (
             User.objects.prefetch_related("groups")
-            .only("id", "phone_number", "first_name", "last_name",
+            .only("id", "phone_number", "first_name", "last_name", "email", "national_id", "birth_date",
                 "status", "is_phone_verified")
             .get(id=request.user.id)
         )
         return Response(UserInfoSerializer(user).data)
+
+    def patch(self, request):
+        serializer = UpdateProfileSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)

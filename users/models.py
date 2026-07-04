@@ -54,6 +54,8 @@ class User(AbstractUser, TimestampedModel):
 
     gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True)
     is_phone_verified = models.BooleanField(_("is phone verified"), default=False)
+    national_id = models.CharField(max_length=10, blank=True, null=True)
+    birth_date = models.CharField(max_length=10, blank=True, null=True)
 
 
     objects = UserManager()  # type: ignore

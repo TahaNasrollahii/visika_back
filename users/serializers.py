@@ -42,6 +42,9 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "full_name",
+            "email",
+            "national_id",
+            "birth_date",
             "status",
             "groups",
             "is_phone_verified",
@@ -49,3 +52,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     def get_groups(self, obj):
         return obj.groups.values_list("name", flat=True)
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email", "national_id", "birth_date")
