@@ -107,3 +107,12 @@ class UserInfoView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class LogoutView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        response = Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+        from users.utils import remove_tokens_from_cookie
+        remove_tokens_from_cookie(response)
+        return response

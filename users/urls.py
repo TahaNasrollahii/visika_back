@@ -12,4 +12,5 @@ urlpatterns = [
     path('otp/login/', views.OTPLoginView.as_view()),
 
     path('info/', views.UserInfoView.as_view()),
+    path('logout/', views.LogoutView.as_view()),
 ]
