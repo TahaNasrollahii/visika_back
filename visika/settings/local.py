@@ -13,15 +13,15 @@ DATABASES = {
 
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": env("REDIS_URL", default="redis://127.0.0.1:6379/1"), 
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
     }
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Run Celery tasks synchronously in local dev to avoid requiring Redis
+CELERY_TASK_ALWAYS_EAGER = True
 
 # Overwrite log format to be simpler for dev
 LOGGING['handlers']['console']['formatter'] = 'verbose'

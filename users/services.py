@@ -18,10 +18,17 @@ class OTPService:
         """
         Generates and sends an OTP via SMS to the specified phone number.
         """
-        # A proper throttling is enforced at the View layer via DRF Throttling.
-        # But we could also check cache directly if we want a hard lock.
+        from django.conf import settings
+        
         otp = OTPService.generate_otp()
         cache.set(f"otp_{phone_number}", otp, timeout=OTP_EXPIRY_SECONDS)
+        
+        if settings.DEBUG:
+            print(f"\n" + "="*50)
+            print(f"DEVELOPMENT MODE: OTP for {phone_number} is: {otp}")
+            print("="*50 + "\n")
+            return
+            
         send_otp_sms.delay(phone_number, otp)
 
     @staticmethod

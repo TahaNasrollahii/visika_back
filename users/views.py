@@ -78,7 +78,7 @@ class OTPLoginView(APIView):
         try:
             user = User.objects.get(phone_number=phone)
         except User.DoesNotExist:
-             raise exceptions.NotFound({"error": "User not found. Sign up first."})
+            user = UserService.create_user(phone_number=phone)
 
         UserService.mark_phone_as_verified(user)
         
