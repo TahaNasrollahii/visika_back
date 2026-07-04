@@ -75,3 +75,24 @@ class User(AbstractUser, TimestampedModel):
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name} ({self.phone_number})"
+
+
+class Address(TimestampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
+    title = models.CharField(max_length=255)
+    detail = models.TextField()
+    postal_code = models.CharField(max_length=20, blank=True, null=True)
+    is_default = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = _("address")
+        verbose_name_plural = _("addresses")
+        ordering = ["-is_default", "-created_at"]
+
+    def save(self, *args, **kwargs):
+        if self.is_default:
+            Address.objects.filter(user=self.user).update(is_default=False)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.title} - {self.user.phone_number}"

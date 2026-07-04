@@ -143,3 +143,26 @@ class FavoriteListView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.favorites.all()
+
+
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from users.models import Address
+from users.serializers import AddressSerializer
+
+class AddressViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def set_default(self, request, pk=None):
+        address = self.get_object()
+        address.is_default = True
+        address.save()
+        return Response({'status': 'address set to default'})

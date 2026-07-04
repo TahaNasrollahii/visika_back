@@ -57,3 +57,12 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email", "national_id", "birth_date")
+
+
+from users.models import Address
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ("id", "title", "detail", "postal_code", "is_default")
+        read_only_fields = ("id",)
