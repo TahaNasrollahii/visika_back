@@ -57,6 +57,7 @@ class User(AbstractUser, TimestampedModel):
     national_id = models.CharField(max_length=10, blank=True, null=True)
     birth_date = models.CharField(max_length=10, blank=True, null=True)
     favorites = models.ManyToManyField('products.Product', related_name='favorited_by', blank=True)
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
 
 
     objects = UserManager()  # type: ignore
