@@ -7,7 +7,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from django.contrib.auth import get_user_model
 from rest_framework.throttling import ScopedRateThrottle
 
-from users.serializers import SignUpSerializer, OTPRequestSerializer, OTPLoginSerializer, UserInfoSerializer, UpdateProfileSerializer
+from users.serializers import SignUpSerializer, OTPRequestSerializer, OTPLoginSerializer, OTPRegisterSerializer, UserInfoSerializer, UpdateProfileSerializer
 from users.utils import set_tokens_on_cookie
 from users.services import OTPService, UserService
 
@@ -78,7 +78,7 @@ class OTPLoginView(APIView):
         try:
             user = User.objects.get(phone_number=phone)
         except User.DoesNotExist:
-            user = UserService.create_user(phone_number=phone)
+            raise exceptions.NotFound({"detail": "کاربری با این شماره یافت نشد. لطفا ثبت نام کنید."})
 
         UserService.mark_phone_as_verified(user)
         
@@ -90,13 +90,52 @@ class OTPLoginView(APIView):
         return response
     
 
+class OTPRegisterView(APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'anon'
+
+    def post(self, request):
+        serializer = OTPRegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        phone = serializer.validated_data['phone_number']
+        incoming_otp = serializer.validated_data['otp']
+        first_name = serializer.validated_data['first_name']
+        last_name = serializer.validated_data['last_name']
+        
+        if not OTPService.verify_otp(phone, incoming_otp):
+            raise exceptions.ValidationError({"otp": "Invalid or expired OTP"})
+
+        try:
+            user = User.objects.get(phone_number=phone)
+            # If user exists, just return error or log them in? 
+            # The prompt says register page is for new users.
+            raise exceptions.ValidationError({"phone_number": "User already exists"})
+        except User.DoesNotExist:
+            user = UserService.create_user(phone_number=phone)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.status = User.StatusChoices.PENDING
+            user.save()
+
+        UserService.mark_phone_as_verified(user)
+        
+        tokens = UserService.get_tokens_for_user(user)
+        
+        response = Response(tokens, status=status.HTTP_201_CREATED)
+        set_tokens_on_cookie(response, tokens["access"], tokens["refresh"])
+        
+        return response
+    
+
 class UserInfoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = (
             User.objects.prefetch_related("groups")
-            .only("id", "phone_number", "first_name", "last_name", "email", "national_id", "birth_date",
+            .only("id", "phone_number", "first_name", "last_name", "email", "national_id",
                 "status", "is_phone_verified")
             .get(id=request.user.id)
         )

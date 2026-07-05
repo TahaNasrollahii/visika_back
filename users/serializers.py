@@ -31,6 +31,13 @@ class OTPLoginSerializer(serializers.Serializer):
     otp = serializers.CharField(max_length=6, min_length=4)
 
 
+class OTPRegisterSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(trim_whitespace=True)
+    otp = serializers.CharField(max_length=6, min_length=4)
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+
+
 class UserInfoSerializer(serializers.ModelSerializer):
     groups = serializers.SerializerMethodField()
     
@@ -44,7 +51,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "full_name",
             "email",
             "national_id",
-            "birth_date",
             "status",
             "groups",
             "is_phone_verified",
@@ -57,7 +63,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "national_id", "birth_date", "avatar")
+        fields = ("first_name", "last_name", "email", "national_id", "avatar")
 
 
 from users.models import Address
