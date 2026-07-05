@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, ProductImage, ProductFeature
+from .models import Category, Product, ProductFeature
 
 class ProductFeatureSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,12 +24,13 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_is_favorite(self, obj):
         request = self.context.get('request')
         if request and request.user and request.user.is_authenticated:
-            # Assuming we can use obj.favorited_by or a prefetch
             return obj.favorited_by.filter(id=request.user.id).exists()
         return False
 
     def get_image(self, obj):
-        image_url = obj.image
-        if image_url:
-            return image_url
-        return None
+        if not obj.image:
+            return None
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.image.url)
+        return obj.image.url

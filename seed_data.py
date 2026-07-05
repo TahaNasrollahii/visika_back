@@ -4,11 +4,10 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'visika.settings.local')
 django.setup()
 
-from products.models import Category, Product, ProductImage, ProductFeature
+from products.models import Category, Product, ProductFeature
 
 Category.objects.all().delete()
 Product.objects.all().delete()
-ProductImage.objects.all().delete()
 ProductFeature.objects.all().delete()
 
 # Create Categories
@@ -23,30 +22,28 @@ cleaning = Category.objects.create(title="شوینده و بهداشتی", slug=
 spices = Category.objects.create(title="چاشنی و ادویه", slug="spices", icon="🧂", color="bg-amber-100 text-amber-600")
 
 
-# Create Products
-p1 = Product.objects.create(title="شیر کم چرب کاله 1 لیتری", price=35000, discount_price=32000, category=dairy, is_best_seller=True, brand="کاله")
-p2 = Product.objects.create(title="روغن آفتابگردان اویلا 1.5 لیتری", price=110000, discount_price=95000, badge="پرفروش", is_best_seller=True, brand="اویلا")
-p3 = Product.objects.create(title="تخم مرغ 20 عددی تلاونگ", price=85000, is_best_seller=True, brand="تلاونگ")
+# Create Products (image field is now directly on Product)
+p1 = Product.objects.create(title="شیر کم چرب کاله 1 لیتری", price=35000, discount_price=32000, category=dairy, is_best_seller=True, brand="کاله",
+                             image="products/Gemini_Generated_Image_3hpnii3hpnii3hpn.png")
+p2 = Product.objects.create(title="روغن آفتابگردان اویلا 1.5 لیتری", price=110000, discount_price=95000, badge="پرفروش", is_best_seller=True, brand="اویلا",
+                             image="products/Gemini_Generated_Image_67xmen67xmen67xm.png")
+p3 = Product.objects.create(title="تخم مرغ 20 عددی تلاونگ", price=85000, is_best_seller=True, brand="تلاونگ",
+                             image="products/Gemini_Generated_Image_6hv3u46hv3u46hv3.png")
 
-p4 = Product.objects.create(title="گوشت چرخ‌کرده گوساله 500 گرمی", price=320000, discount_price=285000, category=meat, is_hot_offer=True, brand="پویا پروتئین")
-p5 = Product.objects.create(title="مرغ کامل تازه بسته بندی 2 کیلویی", price=195000, discount_price=175000, category=meat, badge="پیشنهاد ویژه", is_hot_offer=True, brand="مهیا پروتئین")
+p4 = Product.objects.create(title="گوشت چرخ‌کرده گوساله 500 گرمی", price=320000, discount_price=285000, category=meat, is_hot_offer=True, brand="پویا پروتئین",
+                             image="products/Gemini_Generated_Image_crjfk1crjfk1crjf.png")
+p5 = Product.objects.create(title="مرغ کامل تازه بسته بندی 2 کیلویی", price=195000, discount_price=175000, category=meat, badge="پیشنهاد ویژه", is_hot_offer=True, brand="مهیا پروتئین",
+                             image="products/Gemini_Generated_Image_oxu981oxu981oxu9.png")
 
-p6 = Product.objects.create(title="چیپس مکیما طعم کچاپ 100 گرمی", price=25000, discount_price=22000, category=snacks, badge="جدید", brand="مکیما")
-p7 = Product.objects.create(title="شکلات تلخ پارمیدا 80 درصد", price=75000, category=snacks, is_best_seller=True, brand="پارمیدا")
+p6 = Product.objects.create(title="چیپس مکیما طعم کچاپ 100 گرمی", price=25000, discount_price=22000, category=snacks, badge="جدید", brand="مکیما",
+                             image="products/Gemini_Generated_Image_67xmen67xmen67xm.png")
+p7 = Product.objects.create(title="شکلات تلخ پارمیدا 80 درصد", price=75000, category=snacks, is_best_seller=True, brand="پارمیدا",
+                             image="products/Gemini_Generated_Image_3hpnii3hpnii3hpn.png")
 
-p8 = Product.objects.create(title="نوشابه کوکاکولا خانواده 1.5 لیتری", price=32000, discount_price=29000, category=drinks, is_hot_offer=True, brand="کوکاکولا")
-p9 = Product.objects.create(title="آب معدنی دماوند 1.5 لیتری", price=9000, category=drinks, brand="دماوند")
-
-# Add mock image paths (reusing images for the new ones since we only have 5 real images)
-ProductImage.objects.create(product=p1, image="products/Gemini_Generated_Image_3hpnii3hpnii3hpn.png")
-ProductImage.objects.create(product=p2, image="products/Gemini_Generated_Image_67xmen67xmen67xm.png")
-ProductImage.objects.create(product=p3, image="products/Gemini_Generated_Image_6hv3u46hv3u46hv3.png")
-ProductImage.objects.create(product=p4, image="products/Gemini_Generated_Image_crjfk1crjfk1crjf.png")
-ProductImage.objects.create(product=p5, image="products/Gemini_Generated_Image_oxu981oxu981oxu9.png")
-ProductImage.objects.create(product=p6, image="products/Gemini_Generated_Image_67xmen67xmen67xm.png") # Reusing
-ProductImage.objects.create(product=p7, image="products/Gemini_Generated_Image_3hpnii3hpnii3hpn.png") # Reusing
-ProductImage.objects.create(product=p8, image="products/Gemini_Generated_Image_crjfk1crjfk1crjf.png") # Reusing
-ProductImage.objects.create(product=p9, image="products/Gemini_Generated_Image_oxu981oxu981oxu9.png") # Reusing
+p8 = Product.objects.create(title="نوشابه کوکاکولا خانواده 1.5 لیتری", price=32000, discount_price=29000, category=drinks, is_hot_offer=True, brand="کوکاکولا",
+                             image="products/Gemini_Generated_Image_crjfk1crjfk1crjf.png")
+p9 = Product.objects.create(title="آب معدنی دماوند 1.5 لیتری", price=9000, category=drinks, brand="دماوند",
+                             image="products/Gemini_Generated_Image_oxu981oxu981oxu9.png")
 
 # Create Features
 def add_features(product, features_dict):
