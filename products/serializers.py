@@ -19,7 +19,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'price', 'discountPrice', 'image', 'badge', 'is_best_seller', 'is_hot_offer', 'is_favorite', 'features']
+        fields = ['id', 'title', 'price', 'discountPrice', 'image', 'badge', 'is_best_seller', 'is_hot_offer', 'is_favorite', 'features', 'brand', 'rating', 'reviews_count']
 
     def get_is_favorite(self, obj):
         request = self.context.get('request')

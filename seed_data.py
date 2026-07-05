@@ -24,18 +24,18 @@ spices = Category.objects.create(title="چاشنی و ادویه", slug="spices"
 
 
 # Create Products
-p1 = Product.objects.create(title="شیر کم چرب کاله 1 لیتری", price=35000, discount_price=32000, category=dairy, is_best_seller=True)
-p2 = Product.objects.create(title="روغن آفتابگردان اویلا 1.5 لیتری", price=110000, discount_price=95000, badge="پرفروش", is_best_seller=True)
-p3 = Product.objects.create(title="تخم مرغ 20 عددی تلاونگ", price=85000, is_best_seller=True)
+p1 = Product.objects.create(title="شیر کم چرب کاله 1 لیتری", price=35000, discount_price=32000, category=dairy, is_best_seller=True, brand="کاله", rating=4.5, reviews_count=120)
+p2 = Product.objects.create(title="روغن آفتابگردان اویلا 1.5 لیتری", price=110000, discount_price=95000, badge="پرفروش", is_best_seller=True, brand="اویلا", rating=4.2, reviews_count=85)
+p3 = Product.objects.create(title="تخم مرغ 20 عددی تلاونگ", price=85000, is_best_seller=True, brand="تلاونگ", rating=4.8, reviews_count=210)
 
-p4 = Product.objects.create(title="گوشت چرخ‌کرده گوساله 500 گرمی", price=320000, discount_price=285000, category=meat, is_hot_offer=True)
-p5 = Product.objects.create(title="مرغ کامل تازه بسته بندی 2 کیلویی", price=195000, discount_price=175000, category=meat, badge="پیشنهاد ویژه", is_hot_offer=True)
+p4 = Product.objects.create(title="گوشت چرخ‌کرده گوساله 500 گرمی", price=320000, discount_price=285000, category=meat, is_hot_offer=True, brand="پویا پروتئین", rating=4.1, reviews_count=45)
+p5 = Product.objects.create(title="مرغ کامل تازه بسته بندی 2 کیلویی", price=195000, discount_price=175000, category=meat, badge="پیشنهاد ویژه", is_hot_offer=True, brand="مهیا پروتئین", rating=4.6, reviews_count=150)
 
-p6 = Product.objects.create(title="چیپس مکیما طعم کچاپ 100 گرمی", price=25000, discount_price=22000, category=snacks, badge="جدید")
-p7 = Product.objects.create(title="شکلات تلخ پارمیدا 80 درصد", price=75000, category=snacks, is_best_seller=True)
+p6 = Product.objects.create(title="چیپس مکیما طعم کچاپ 100 گرمی", price=25000, discount_price=22000, category=snacks, badge="جدید", brand="مکیما", rating=3.9, reviews_count=30)
+p7 = Product.objects.create(title="شکلات تلخ پارمیدا 80 درصد", price=75000, category=snacks, is_best_seller=True, brand="پارمیدا", rating=4.9, reviews_count=320)
 
-p8 = Product.objects.create(title="نوشابه کوکاکولا خانواده 1.5 لیتری", price=32000, discount_price=29000, category=drinks, is_hot_offer=True)
-p9 = Product.objects.create(title="آب معدنی دماوند 1.5 لیتری", price=9000, category=drinks)
+p8 = Product.objects.create(title="نوشابه کوکاکولا خانواده 1.5 لیتری", price=32000, discount_price=29000, category=drinks, is_hot_offer=True, brand="کوکاکولا", rating=4.7, reviews_count=540)
+p9 = Product.objects.create(title="آب معدنی دماوند 1.5 لیتری", price=9000, category=drinks, brand="دماوند", rating=4.3, reviews_count=95)
 
 # Add mock image paths (reusing images for the new ones since we only have 5 real images)
 ProductImage.objects.create(product=p1, image="products/Gemini_Generated_Image_3hpnii3hpnii3hpn.png")

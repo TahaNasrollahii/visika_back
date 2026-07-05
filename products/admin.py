@@ -19,8 +19,8 @@ class ProductFeatureInline(TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
-    list_display = ('title', 'category', 'price', 'discount_price', 'is_best_seller', 'is_hot_offer')
-    search_fields = ('title', 'description', 'badge')
-    list_filter = ('category', 'is_best_seller', 'is_hot_offer')
+    list_display = ('title', 'category', 'price', 'brand', 'rating', 'is_best_seller', 'is_hot_offer')
+    search_fields = ('title', 'description', 'badge', 'brand')
+    list_filter = ('category', 'is_best_seller', 'is_hot_offer', 'brand')
     inlines = [ProductImageInline, ProductFeatureInline]
     readonly_fields = ('created_at', 'updated_at')
