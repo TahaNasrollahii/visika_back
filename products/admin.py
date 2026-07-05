@@ -19,7 +19,7 @@ class ProductFeatureInline(TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
-    list_display = ('title', 'category', 'price', 'brand', 'rating', 'is_best_seller', 'is_hot_offer')
+    list_display = ('title', 'category', 'price', 'brand', 'is_best_seller', 'is_hot_offer')
     search_fields = ('title', 'description', 'badge', 'brand')
     list_filter = ('category', 'is_best_seller', 'is_hot_offer', 'brand')
     inlines = [ProductImageInline, ProductFeatureInline]

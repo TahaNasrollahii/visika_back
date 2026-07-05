@@ -52,7 +52,7 @@ class ProductListView(generics.ListAPIView):
             queryset = queryset.filter(brand__in=brand_list)
             
         if ordering:
-            if ordering in ['price', '-price', '-created_at', 'created_at', '-reviews_count', 'reviews_count']:
+            if ordering in ['price', '-price', '-created_at', 'created_at']:
                 queryset = queryset.order_by(ordering)
             
         return queryset

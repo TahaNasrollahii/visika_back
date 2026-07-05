@@ -23,8 +23,6 @@ class Product(TimestampedModel):
     is_best_seller = models.BooleanField(default=False)
     is_hot_offer = models.BooleanField(default=False)
     brand = models.CharField(max_length=100, blank=True)
-    rating = models.FloatField(default=0.0)
-    reviews_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title
