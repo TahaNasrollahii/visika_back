@@ -76,6 +76,9 @@ class User(AbstractUser, TimestampedModel):
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name} ({self.phone_number})"
 
+    def get_username(self) -> str:
+        return str(self.phone_number)
+
 
 class Address(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
