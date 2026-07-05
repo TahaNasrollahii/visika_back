@@ -39,3 +39,14 @@ class ProductImage(TimestampedModel):
 
     def __str__(self):
         return f"Image for {self.product.title}"
+
+class ProductFeature(TimestampedModel):
+    product = models.ForeignKey(Product, related_name='features', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    value = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.title}: {self.value}"

@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, ProductFeature
+
+class ProductFeatureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductFeature
+        fields = ['id', 'title', 'value']
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,10 +15,11 @@ class ProductSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     discountPrice = serializers.IntegerField(source='discount_price', read_only=True)
     is_favorite = serializers.SerializerMethodField()
+    features = ProductFeatureSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'price', 'discountPrice', 'image', 'badge', 'is_best_seller', 'is_hot_offer', 'is_favorite']
+        fields = ['id', 'title', 'price', 'discountPrice', 'image', 'badge', 'is_best_seller', 'is_hot_offer', 'is_favorite', 'features']
 
     def get_is_favorite(self, obj):
         request = self.context.get('request')

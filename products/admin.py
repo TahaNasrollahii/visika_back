@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin, TabularInline
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, ProductFeature
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
@@ -13,10 +13,14 @@ class ProductImageInline(TabularInline):
     model = ProductImage
     extra = 1
 
+class ProductFeatureInline(TabularInline):
+    model = ProductFeature
+    extra = 1
+
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
     list_display = ('title', 'category', 'price', 'discount_price', 'is_best_seller', 'is_hot_offer')
     search_fields = ('title', 'description', 'badge')
     list_filter = ('category', 'is_best_seller', 'is_hot_offer')
-    inlines = [ProductImageInline]
+    inlines = [ProductImageInline, ProductFeatureInline]
     readonly_fields = ('created_at', 'updated_at')
