@@ -54,6 +54,14 @@ class OTPRequestView(APIView):
         serializer = OTPRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         phone = serializer.validated_data['phone_number']
+        action = request.data.get('action')
+        
+        if action == 'login':
+            if not User.objects.filter(phone_number=phone).exists():
+                raise exceptions.NotFound({"detail": "کاربری با این شماره یافت نشد."})
+        elif action == 'register':
+            if User.objects.filter(phone_number=phone).exists():
+                raise exceptions.ValidationError({"phone_number": "کاربری با این شماره از قبل وجود دارد."})
         
         OTPService.request_otp(phone)
 
