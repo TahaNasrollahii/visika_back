@@ -197,5 +197,5 @@ Currently, endpoints can be explored via Postman or cURL.
 ---
 
 <div align="center">
-  <p>Developed with ❤️ by <strong>Ramin👑</strong></p>
+  <p>Developed with ❤️ by <strong>Taha👑</strong></p>
 </div>
