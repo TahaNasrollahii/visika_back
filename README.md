@@ -99,6 +99,10 @@ The easiest way to get the project up and running is via Docker. This setup incl
    ```bash
    docker-compose exec web python manage.py createsuperuser
    ```
+4. **Seed the Database with Initial Data:**
+   ```bash
+   docker-compose exec web python seed_data.py
+   ```
 
 *The API will be available at `http://localhost:8000`.*
 
@@ -142,6 +146,11 @@ If you prefer running the project locally without Docker (e.g., using SQLite for
    *Celery Worker:*
    ```bash
    celery -A visika worker --loglevel=INFO
+   ```
+
+6. **Seed the Database with Initial Data:**
+   ```bash
+   python seed_data.py
    ```
 
 ---
