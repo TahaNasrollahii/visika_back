@@ -6,6 +6,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.exceptions import InvalidToken
 from django.contrib.auth import get_user_model
 from rest_framework.throttling import ScopedRateThrottle
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from users.serializers import SignUpSerializer, OTPRequestSerializer, OTPLoginSerializer, OTPRegisterSerializer, UserInfoSerializer, UpdateProfileSerializer
 from users.utils import set_tokens_on_cookie
@@ -13,6 +15,7 @@ from users.services import OTPService, UserService
 
 User = get_user_model()
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class LoginView(TokenObtainPairView):
     def post(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
@@ -28,6 +31,7 @@ class LoginView(TokenObtainPairView):
         return response
     
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class SignUpView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
@@ -68,6 +72,7 @@ class OTPRequestView(APIView):
         return Response({"message": "OTP sent successfully"}, status=status.HTTP_200_OK)
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class OTPLoginView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
@@ -98,6 +103,7 @@ class OTPLoginView(APIView):
         return response
     
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class OTPRegisterView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
@@ -137,6 +143,7 @@ class OTPRegisterView(APIView):
         return response
     
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class UserInfoView(APIView):
     permission_classes = [IsAuthenticated]
 
