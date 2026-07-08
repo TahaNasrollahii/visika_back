@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'core',
     'products',
     'orders',
+    'shopping',
 ]
 
 MIDDLEWARE = [
@@ -186,6 +187,16 @@ UNFOLD = {
                         "icon": "location_on",
                         "link": reverse_lazy("admin:users_address_changelist"),
                     },
+                    {
+                        "title": _("Vendors"),
+                        "icon": "store",
+                        "link": reverse_lazy("admin:users_vendor_changelist"),
+                    },
+                    {
+                        "title": _("Vendor delivery rules"),
+                        "icon": "local_shipping",
+                        "link": reverse_lazy("admin:users_vendordeliveryrule_changelist"),
+                    },
                 ],
             },
             {
@@ -217,6 +228,17 @@ UNFOLD = {
                         "title": _("Orders"),
                         "icon": "receipt_long",
                         "link": reverse_lazy("admin:orders_order_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Shopping"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Basket rules"),
+                        "icon": "rule",
+                        "link": reverse_lazy("admin:shopping_basketrule_changelist"),
                     },
                 ],
             },

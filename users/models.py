@@ -99,3 +99,33 @@ class Address(TimestampedModel):
 
     def __str__(self):
         return f"{self.title} - {self.user.phone_number}"
+
+class Vendor(TimestampedModel):
+    is_active = models.BooleanField(default=True)
+    profile_image = models.ImageField(null=True, blank=True)
+    name = models.CharField(max_length=50)
+    description = models.TextField(max_length=100)
+    user = models.OneToOneField(to=User, verbose_name="manager",  on_delete=models.CASCADE, related_name="vendor", null=True, blank=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+class VendorDeliveryRule(TimestampedModel):
+    vendor = models.OneToOneField(Vendor, on_delete=models.CASCADE, related_name="delivery_rule")
+    # Delivery settings
+    preparation_days = models.PositiveSmallIntegerField(default=2)
+    end_of_order_taking_hour = models.PositiveSmallIntegerField(
+        default=15,
+        validators=(MinValueValidator(0), MaxValueValidator(24))
+    )
+    
+    # Delivery Days
+    saturday = models.BooleanField(default=True)
+    sunday = models.BooleanField(default=True)
+    monday = models.BooleanField(default=True)
+    tuesday = models.BooleanField(default=True)
+    wednesday = models.BooleanField(default=True)
+    thursday = models.BooleanField(default=True)
+    friday = models.BooleanField(default=False)

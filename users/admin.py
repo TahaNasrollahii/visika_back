@@ -16,3 +16,17 @@ class AddressAdmin(ModelAdmin):
     search_fields = ('title', 'user__phone_number', 'user__first_name', 'user__last_name', 'postal_code')
     list_filter = ('is_default', 'created_at')
     readonly_fields = ('created_at', 'updated_at')
+
+from .models import Vendor, VendorDeliveryRule
+
+@admin.register(Vendor)
+class VendorAdmin(ModelAdmin):
+    list_display = ('name', 'user', 'is_active')
+    search_fields = ('name', 'user__phone_number')
+    list_filter = ('is_active',)
+
+@admin.register(VendorDeliveryRule)
+class VendorDeliveryRuleAdmin(ModelAdmin):
+    list_display = ('vendor', 'preparation_days', 'end_of_order_taking_hour')
+    search_fields = ('vendor__name',)
+
