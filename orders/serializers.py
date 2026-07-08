@@ -22,10 +22,11 @@ from .models import Cart, CartItem, Order, OrderItem
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_title = serializers.CharField(source='product.title', read_only=True)
+    product_brand = serializers.CharField(source='product.brand', read_only=True)
     
     class Meta:
         model = OrderItem
-        fields = ['id', 'product_title', 'quantity', 'price']
+        fields = ['id', 'product_title', 'product_brand', 'quantity', 'price', 'delivery_time']
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)

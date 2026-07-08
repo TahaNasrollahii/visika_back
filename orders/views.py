@@ -54,12 +54,18 @@ class CheckoutView(generics.CreateAPIView):
             status='paid' # Mocking payment success
         )
 
+        delivery_times = request.data.get('delivery_times', {})
+
         for item in cart.items.all():
+            brand = item.product.brand if item.product and item.product.brand else "بدون برند"
+            delivery_time = delivery_times.get(brand, "")
+            
             OrderItem.objects.create(
                 order=order,
                 product=item.product,
                 quantity=item.quantity,
-                price=item.product.discount_price if item.product.discount_price else item.product.price
+                price=item.product.discount_price if item.product.discount_price else item.product.price,
+                delivery_time=delivery_time
             )
         
         cart.items.all().delete()
@@ -73,3 +79,10 @@ class OrderListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).order_by('-created_at')
+
+class OrderRetrieveView(generics.RetrieveAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)

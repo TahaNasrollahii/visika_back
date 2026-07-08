@@ -44,6 +44,7 @@ class OrderItem(TimestampedModel):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     quantity = models.PositiveIntegerField()
     price = models.PositiveIntegerField() # Price at the time of order
+    delivery_time = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return f"{self.quantity} x {self.product.title if self.product else 'Deleted'}"
