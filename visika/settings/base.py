@@ -54,7 +54,7 @@ ROOT_URLCONF = 'visika.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -168,6 +168,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 UNFOLD = {
+    "DASHBOARD_CALLBACK": "core.dashboard.dashboard_callback",
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": True,

@@ -25,6 +25,7 @@ class Product(TimestampedModel):
     is_hot_offer = models.BooleanField(default=False)
     brand = models.CharField(max_length=100, blank=True)
     vendor = models.ForeignKey('users.Vendor', on_delete=models.CASCADE, related_name='products', null=True, blank=True)
+    stock = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title
