@@ -1,3 +1,4 @@
+import json
 from rest_framework import serializers
 from products.models import Product, ProductFeature
 from orders.models import OrderItem, Order
@@ -11,10 +12,11 @@ class VendorProductFeatureSerializer(serializers.ModelSerializer):
 class VendorProductSerializer(serializers.ModelSerializer):
     features = VendorProductFeatureSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField(read_only=True)
+    features_data = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'description', 'price', 'discount_price', 'category', 'image', 'image_url', 'badge', 'is_best_seller', 'is_hot_offer', 'stock', 'features']
+        fields = ['id', 'title', 'description', 'price', 'discount_price', 'category', 'image', 'image_url', 'badge', 'is_best_seller', 'is_hot_offer', 'stock', 'features', 'features_data']
         read_only_fields = ['id']
 
     def get_image_url(self, obj):
@@ -24,6 +26,33 @@ class VendorProductSerializer(serializers.ModelSerializer):
         if request:
             return request.build_absolute_uri(obj.image.url)
         return obj.image.url
+
+    def create(self, validated_data):
+        features_data = validated_data.pop('features_data', None)
+        product = super().create(validated_data)
+        if features_data:
+            try:
+                features = json.loads(features_data)
+                for f in features:
+                    if f.get('title') and f.get('value'):
+                        ProductFeature.objects.create(product=product, title=f['title'], value=f['value'])
+            except json.JSONDecodeError:
+                pass
+        return product
+
+    def update(self, instance, validated_data):
+        features_data = validated_data.pop('features_data', None)
+        product = super().update(instance, validated_data)
+        if features_data is not None:
+            try:
+                features = json.loads(features_data)
+                instance.features.all().delete()
+                for f in features:
+                    if f.get('title') and f.get('value'):
+                        ProductFeature.objects.create(product=product, title=f['title'], value=f['value'])
+            except json.JSONDecodeError:
+                pass
+        return product
 
 class VendorOrderSerializer(serializers.ModelSerializer):
     customer_phone = serializers.CharField(source='order.user.phone_number', read_only=True)
