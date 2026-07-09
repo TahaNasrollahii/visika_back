@@ -12,4 +12,5 @@ class IsVendor(permissions.IsAuthenticated):
         is_auth = super().has_permission(request, view)
         if not is_auth:
             return False
-        return request.user.role == request.user.RoleChoices.VENDOR
+        return (request.user.role == request.user.RoleChoices.VENDOR and 
+                request.user.status == request.user.StatusChoices.ACTIVE)
