@@ -168,6 +168,21 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 UNFOLD = {
+    "COLORS": {
+        "primary": {
+            "50": "#eff6ff",
+            "100": "#dbeafe",
+            "200": "#bfdbfe",
+            "300": "#93c5fd",
+            "400": "#60a5fa",
+            "500": "#0052FF",
+            "600": "#0047df",
+            "700": "#003bbd",
+            "800": "#002f9c",
+            "900": "#00247b",
+            "950": "#00185a",
+        },
+    },
     "DASHBOARD_CALLBACK": "core.dashboard.dashboard_callback",
     "SIDEBAR": {
         "show_search": True,

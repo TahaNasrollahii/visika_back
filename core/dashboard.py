@@ -33,7 +33,7 @@ def dashboard_callback(request, context):
         "datasets": [{
             "label": "Daily count",
             "data": order_counts,
-            "borderColor": "#e85d04", # matching unfold brand color or primary
+            "borderColor": "#0052FF", # matching unfold brand color or primary
             "backgroundColor": "transparent",
             "tension": 0.4
         }]
