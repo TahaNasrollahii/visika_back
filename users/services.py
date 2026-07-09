@@ -27,7 +27,7 @@ class OTPService:
             print(f"\n" + "="*50)
             print(f"DEVELOPMENT MODE: OTP for {phone_number} is: {otp}")
             print("="*50 + "\n")
-            return
+            # return  # commented out to test SMS sending in dev mode
             
         send_otp_sms.delay(phone_number, otp)
 

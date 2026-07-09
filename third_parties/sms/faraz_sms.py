@@ -11,7 +11,7 @@ class SMSProviderException(APIException):
 
 
 class SMSHandler:
-    BASE_URL = "https://edge.ippanel.com/v1"
+    BASE_URL = "https://api.iranpayamak.com/ws/v1"
     
     def __init__(self):
         self.api_key = getattr(settings, "FARAZ_SMS_API_KEY", "")
@@ -27,7 +27,8 @@ class SMSHandler:
     
     def get_headers(self):
         return {
-            "Authorization": self.api_key,
+            "Accept": "application/json",
+            "Api-Key": self.api_key,
             "Content-Type": "application/json",
         }
         
@@ -47,14 +48,14 @@ class SMSHandler:
             raise SMSProviderException(f"Failed to communicate with SMS provider: {e}")
     
     def send_sms_with_pattern(self, recipient_phone_number, otp_code):
-        url = f"{self.BASE_URL}/api/send"
+        url = f"{self.BASE_URL}/sms/pattern"
         headers = self.get_headers()
         body = {
-            "sending_type": "pattern",
-            "from_number": self.sender_number,
             "code": self.login_otp_pattern_code,
-            "recipients": [recipient_phone_number],
-            "params": {"verification-code": otp_code,},
+            "attributes": {"code": str(otp_code)},
+            "recipient": recipient_phone_number,
+            "line_number": self.sender_number,
+            "number_format": "english"
         }
         return self.send_request(
             method="POST",

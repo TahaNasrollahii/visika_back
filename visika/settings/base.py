@@ -89,7 +89,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "1000/hour",
         "user": "2000/hour",
-        "otp": "5/hour"
+        "otp": "500/hour"
     },
     "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler"
 }
