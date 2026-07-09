@@ -6,10 +6,27 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'visika.settings.local')
 django.setup()
 
 from products.models import Category, Product, ProductFeature
+from users.models import User, Vendor
 
 Category.objects.all().delete()
 Product.objects.all().delete()
 ProductFeature.objects.all().delete()
+User.objects.filter(role=User.RoleChoices.VENDOR).delete()
+
+def get_or_create_vendor(brand_name):
+    try:
+        vendor = Vendor.objects.get(name=brand_name)
+    except Vendor.DoesNotExist:
+        phone = f"+98999{random.randint(1000000, 9999999)}"
+        while User.objects.filter(phone_number=phone).exists():
+            phone = f"+98999{random.randint(1000000, 9999999)}"
+        user = User.objects.create_user(phone_number=phone, password="password123")
+        user.first_name = brand_name
+        user.role = User.RoleChoices.VENDOR
+        user.status = User.StatusChoices.ACTIVE
+        user.save()
+        vendor = Vendor.objects.create(user=user, name=brand_name, is_active=True)
+    return vendor
 
 # Create Categories
 dairy = Category.objects.create(title="لبنیات", slug="dairy", icon="🥛", color="bg-blue-100 text-blue-600", image="categories/cat_dairy_1783598508290.png")
@@ -24,26 +41,26 @@ spices = Category.objects.create(title="چاشنی و ادویه", slug="spices"
 
 
 # Create Products (image field is now directly on Product)
-p1 = Product.objects.create(title="شیر کم چرب کاله 1 لیتری", price=35000, discount_price=32000, category=dairy, is_best_seller=True, brand="کاله",
+p1 = Product.objects.create(title="شیر کم چرب کاله 1 لیتری", price=35000, discount_price=32000, category=dairy, is_best_seller=True, vendor=get_or_create_vendor("کاله"),
                              image="products/Gemini_Generated_Image_3hpnii3hpnii3hpn.png")
-p2 = Product.objects.create(title="روغن آفتابگردان اویلا 1.5 لیتری", price=110000, discount_price=95000, badge="پرفروش", is_best_seller=True, brand="اویلا",
+p2 = Product.objects.create(title="روغن آفتابگردان اویلا 1.5 لیتری", price=110000, discount_price=95000, badge="پرفروش", is_best_seller=True, vendor=get_or_create_vendor("اویلا"),
                              image="products/Gemini_Generated_Image_67xmen67xmen67xm.png")
-p3 = Product.objects.create(title="تخم مرغ 20 عددی تلاونگ", price=85000, is_best_seller=True, brand="تلاونگ", category=breakfast,
+p3 = Product.objects.create(title="تخم مرغ 20 عددی تلاونگ", price=85000, is_best_seller=True, vendor=get_or_create_vendor("تلاونگ"), category=breakfast,
                              image="products/Gemini_Generated_Image_6hv3u46hv3u46hv3.png")
 
-p4 = Product.objects.create(title="گوشت چرخ‌کرده گوساله 500 گرمی", price=320000, discount_price=285000, category=meat, is_hot_offer=True, brand="پویا پروتئین",
+p4 = Product.objects.create(title="گوشت چرخ‌کرده گوساله 500 گرمی", price=320000, discount_price=285000, category=meat, is_hot_offer=True, vendor=get_or_create_vendor("پویا پروتئین"),
                              image="products/Gemini_Generated_Image_crjfk1crjfk1crjf.png")
-p5 = Product.objects.create(title="مرغ کامل تازه بسته بندی 2 کیلویی", price=195000, discount_price=175000, category=meat, badge="پیشنهاد ویژه", is_hot_offer=True, brand="مهیا پروتئین",
+p5 = Product.objects.create(title="مرغ کامل تازه بسته بندی 2 کیلویی", price=195000, discount_price=175000, category=meat, badge="پیشنهاد ویژه", is_hot_offer=True, vendor=get_or_create_vendor("مهیا پروتئین"),
                              image="products/Gemini_Generated_Image_oxu981oxu981oxu9.png")
 
-p6 = Product.objects.create(title="چیپس مکیما طعم کچاپ 100 گرمی", price=25000, discount_price=22000, category=snacks, badge="جدید", brand="مکیما",
+p6 = Product.objects.create(title="چیپس مکیما طعم کچاپ 100 گرمی", price=25000, discount_price=22000, category=snacks, badge="جدید", vendor=get_or_create_vendor("مکیما"),
                              image="products/Gemini_Generated_Image_67xmen67xmen67xm.png")
-p7 = Product.objects.create(title="شکلات تلخ پارمیدا 80 درصد", price=75000, category=snacks, is_best_seller=True, brand="پارمیدا",
+p7 = Product.objects.create(title="شکلات تلخ پارمیدا 80 درصد", price=75000, category=snacks, is_best_seller=True, vendor=get_or_create_vendor("پارمیدا"),
                              image="products/Gemini_Generated_Image_3hpnii3hpnii3hpn.png")
 
-p8 = Product.objects.create(title="نوشابه کوکاکولا خانواده 1.5 لیتری", price=32000, discount_price=29000, category=drinks, is_hot_offer=True, brand="کوکاکولا",
+p8 = Product.objects.create(title="نوشابه کوکاکولا خانواده 1.5 لیتری", price=32000, discount_price=29000, category=drinks, is_hot_offer=True, vendor=get_or_create_vendor("کوکاکولا"),
                              image="products/Gemini_Generated_Image_crjfk1crjfk1crjf.png")
-p9 = Product.objects.create(title="آب معدنی دماوند 1.5 لیتری", price=9000, category=drinks, brand="دماوند",
+p9 = Product.objects.create(title="آب معدنی دماوند 1.5 لیتری", price=9000, category=drinks, vendor=get_or_create_vendor("دماوند"),
                              image="products/Gemini_Generated_Image_oxu981oxu981oxu9.png")
 
 # Create Features
@@ -94,7 +111,7 @@ for idx, (name, img, cat) in enumerate(new_products_data):
         discount_price=9000 + (idx * 5000) if idx % 3 == 0 else None,
         category=cat,
         image=img,
-        brand="متفرقه",
+        vendor=get_or_create_vendor("متفرقه"),
         is_best_seller=(idx % 4 == 0),
         is_hot_offer=(idx % 5 == 0)
     )

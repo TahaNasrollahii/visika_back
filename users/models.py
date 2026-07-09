@@ -62,6 +62,7 @@ class User(AbstractUser, TimestampedModel):
     national_id = models.CharField(max_length=10, blank=True, null=True)
     favorites = models.ManyToManyField('products.Product', related_name='favorited_by', blank=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    requested_brand_name = models.CharField(max_length=150, blank=True, null=True)
 
 
     objects = UserManager()  # type: ignore
@@ -146,3 +147,18 @@ class Notification(TimestampedModel):
 
     def __str__(self):
         return f"Notification to {self.recipient.phone_number} from {self.sender.name}"
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def create_vendor_on_activation(sender, instance, created, **kwargs):
+    if instance.role == User.RoleChoices.VENDOR and instance.status == User.StatusChoices.ACTIVE:
+        if not hasattr(instance, 'vendor') or instance.vendor is None:
+            brand_name = instance.requested_brand_name or f"فروشگاه {instance.first_name} {instance.last_name}"
+            Vendor.objects.create(
+                user=instance,
+                name=brand_name,
+                description="توضیحات فروشگاه خود را وارد کنید",
+                is_active=True
+            )

@@ -15,13 +15,13 @@ class ProductFeatureInline(TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
-    list_display = ('title', 'category', 'price', 'brand', 'is_best_seller', 'is_hot_offer')
-    search_fields = ('title', 'description', 'badge', 'brand')
-    list_filter = ('category', 'is_best_seller', 'is_hot_offer', 'brand')
+    list_display = ('title', 'category', 'price', 'vendor', 'is_best_seller', 'is_hot_offer')
+    search_fields = ('title', 'description', 'badge', 'vendor__name')
+    list_filter = ('category', 'is_best_seller', 'is_hot_offer')
     inlines = [ProductFeatureInline]
     readonly_fields = ('created_at', 'updated_at')
     fields = (
-        'title', 'description', 'category', 'brand',
+        'title', 'description', 'category', 'vendor',
         'image',
         'price', 'discount_price', 'badge',
         'is_best_seller', 'is_hot_offer',

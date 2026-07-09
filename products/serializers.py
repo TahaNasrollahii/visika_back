@@ -26,10 +26,14 @@ class ProductSerializer(serializers.ModelSerializer):
     discountPrice = serializers.IntegerField(source='discount_price', read_only=True)
     is_favorite = serializers.SerializerMethodField()
     features = ProductFeatureSerializer(many=True, read_only=True)
+    brand = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'title', 'price', 'discountPrice', 'image', 'badge', 'is_best_seller', 'is_hot_offer', 'is_favorite', 'features', 'brand']
+
+    def get_brand(self, obj):
+        return obj.vendor.name if obj.vendor else "متفرقه"
 
     def get_is_favorite(self, obj):
         request = self.context.get('request')

@@ -14,7 +14,7 @@ class VendorProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'description', 'price', 'discount_price', 'category', 'image', 'image_url', 'badge', 'is_best_seller', 'is_hot_offer', 'brand', 'stock', 'features']
+        fields = ['id', 'title', 'description', 'price', 'discount_price', 'category', 'image', 'image_url', 'badge', 'is_best_seller', 'is_hot_offer', 'stock', 'features']
         read_only_fields = ['id']
 
     def get_image_url(self, obj):

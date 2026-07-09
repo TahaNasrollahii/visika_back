@@ -37,6 +37,7 @@ class OTPRegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=150)
     last_name = serializers.CharField(max_length=150)
     role = serializers.ChoiceField(choices=User.RoleChoices.choices, default=User.RoleChoices.CUSTOMER)
+    brand_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
