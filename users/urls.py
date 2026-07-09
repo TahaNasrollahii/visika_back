@@ -21,4 +21,5 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name='user-logout'),
     path('favorites/', views.FavoriteListView.as_view(), name='favorite-list'),
     path('favorites/<int:product_id>/toggle/', views.ToggleFavoriteView.as_view(), name='favorite-toggle'),
+    path('notifications/', views.NotificationListView.as_view(), name='user-notifications'),
 ]
