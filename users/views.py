@@ -117,6 +117,7 @@ class OTPRegisterView(APIView):
         incoming_otp = serializer.validated_data['otp']
         first_name = serializer.validated_data['first_name']
         last_name = serializer.validated_data['last_name']
+        role = serializer.validated_data['role']
         
         if not OTPService.verify_otp(phone, incoming_otp):
             raise exceptions.ValidationError({"otp": "Invalid or expired OTP"})
@@ -130,8 +131,18 @@ class OTPRegisterView(APIView):
             user = UserService.create_user(phone_number=phone)
             user.first_name = first_name
             user.last_name = last_name
-            user.status = User.StatusChoices.PENDING
+            user.status = User.StatusChoices.ACTIVE # Changed to ACTIVE so they can login and do things immediately based on assumed defaults
+            user.role = role
             user.save()
+
+            if role == User.RoleChoices.VENDOR:
+                from users.models import Vendor
+                Vendor.objects.create(
+                    user=user,
+                    name=f"فروشگاه {first_name} {last_name}",
+                    description="توضیحات فروشگاه خود را وارد کنید",
+                    is_active=True
+                )
 
         UserService.mark_phone_as_verified(user)
         
@@ -151,7 +162,7 @@ class UserInfoView(APIView):
         user = (
             User.objects.prefetch_related("groups")
             .only("id", "phone_number", "first_name", "last_name", "email", "national_id",
-                "status", "is_phone_verified")
+                "status", "role", "is_phone_verified")
             .get(id=request.user.id)
         )
         return Response(UserInfoSerializer(user).data)

@@ -36,6 +36,7 @@ class OTPRegisterSerializer(serializers.Serializer):
     otp = serializers.CharField(max_length=6, min_length=4)
     first_name = serializers.CharField(max_length=150)
     last_name = serializers.CharField(max_length=150)
+    role = serializers.ChoiceField(choices=User.RoleChoices.choices, default=User.RoleChoices.CUSTOMER)
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -52,6 +53,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "email",
             "national_id",
             "status",
+            "role",
             "groups",
             "is_phone_verified",
             "avatar",

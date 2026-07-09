@@ -1,12 +1,13 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from users.permissions import IsCustomer
 from .models import Cart, CartItem, Order, OrderItem
 from .serializers import CartSerializer, CartItemSerializer, OrderSerializer
 
 class CartRetrieveUpdateView(generics.RetrieveAPIView):
     serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def get_object(self):
         cart, created = Cart.objects.get_or_create(user=self.request.user)
@@ -14,7 +15,7 @@ class CartRetrieveUpdateView(generics.RetrieveAPIView):
 
 class CartItemAddView(generics.CreateAPIView):
     serializer_class = CartItemSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def create(self, request, *args, **kwargs):
         cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -35,13 +36,13 @@ class CartItemAddView(generics.CreateAPIView):
 
 class CartItemUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def get_queryset(self):
         return CartItem.objects.filter(cart__user=self.request.user)
 
 class CheckoutView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def create(self, request, *args, **kwargs):
         cart = Cart.objects.filter(user=request.user).first()
@@ -75,14 +76,14 @@ class CheckoutView(generics.CreateAPIView):
 
 class OrderListView(generics.ListAPIView):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).order_by('-created_at')
 
 class OrderRetrieveView(generics.RetrieveAPIView):
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsCustomer]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)

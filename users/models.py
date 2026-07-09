@@ -50,7 +50,12 @@ class User(AbstractUser, TimestampedModel):
         ACTIVE = 2, "Active"
         BANNED = 3, "Banned"
 
+    class RoleChoices(models.TextChoices):
+        CUSTOMER = "customer", _("Customer")
+        VENDOR = "vendor", _("Vendor")
+
     status = models.IntegerField(choices=StatusChoices.choices, default=StatusChoices.PENDING)
+    role = models.CharField(max_length=15, choices=RoleChoices.choices, default=RoleChoices.CUSTOMER)
 
     gender = models.IntegerField(choices=GenderChoices.choices, null=True, blank=True)
     is_phone_verified = models.BooleanField(_("is phone verified"), default=False)
@@ -129,3 +134,15 @@ class VendorDeliveryRule(TimestampedModel):
     wednesday = models.BooleanField(default=True)
     thursday = models.BooleanField(default=True)
     friday = models.BooleanField(default=False)
+
+class Notification(TimestampedModel):
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    sender = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name="sent_notifications")
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Notification to {self.recipient.phone_number} from {self.sender.name}"
