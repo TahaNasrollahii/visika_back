@@ -62,32 +62,38 @@ add_features(p8, {"حجم": "۱.۵ لیتر", "طعم": "کولا", "نوع بس
 add_features(p9, {"حجم": "۱.۵ لیتر", "نوع آب": "آب معدنی طبیعی", "سرچشمه": "دماوند"})
 
 # 20 more new products
-new_images = [
-    "products/prod_cheese_1783598643828.png",
-    "products/prod_oil_1783598624369.png",
-    "products/prod_rice_1783598614957.png",
-    "products/prod_tea_1783598634428.png",
-    "products/prod_tomato_1783598653011.png"
-]
-
 all_categories = [dairy, meat, snacks, drinks, fruits, bakery, breakfast, cleaning, spices]
 
-new_product_names = [
-    "برنج هاشمی درجه یک ۵ کیلویی", "چای سیاه سیلان ۵۰۰ گرمی", "پنیر پیتزا مطهر ۱ کیلویی", 
-    "گوجه فرنگی بوته‌ای دستچین", "روغن زیتون فرابکر نیم لیتری", "پودر لباسشویی پرسیل", 
-    "مایع دستشویی صحت", "ماکارونی رشته‌ای مانا", "سس مایونز مهرام", "خیار گلخانه‌ای درجه یک",
-    "سیب زمینی زرد پیازی", "بیسکوییت ساقه طلایی", "رب گوجه فرنگی تبرک", "کره حیوانی میهن ۱۰۰ گرم",
-    "خامه صبحانه پگاه", "ماست چکیده کاله", "شامپو سر صحت", "کیک براونی شیرین عسل",
-    "قهوه ترک بن مانو", "زعفران سحرخیز یک مثقال"
+new_products_data = [
+    ("برنج هاشمی درجه یک ۵ کیلویی", "products/prod_rice_1783598614957.png", spices),
+    ("چای سیاه سیلان ۵۰۰ گرمی", "products/prod_tea_1783598634428.png", drinks),
+    ("پنیر پیتزا مطهر ۱ کیلویی", "products/prod_cheese_1783598643828.png", dairy),
+    ("گوجه فرنگی بوته‌ای دستچین", "products/prod_tomato_new.jpg", fruits),
+    ("روغن زیتون فرابکر نیم لیتری", "products/prod_oil_2_1783598944186.png", spices),
+    ("پودر لباسشویی پرسیل", "products/prod_washing_powder_1783598955868.png", cleaning),
+    ("مایع دستشویی صحت", "products/prod_liquid_soap_1783598966285.png", cleaning),
+    ("شیر پرچرب پگاه ۱ لیتری", "products/Gemini_Generated_Image_3hpnii3hpnii3hpn.png", dairy),
+    ("چیپس نمکی لیمویی مزمز", "products/Gemini_Generated_Image_67xmen67xmen67xm.png", snacks),
+    ("تخم بلدرچین ۱۲ عددی", "products/Gemini_Generated_Image_6hv3u46hv3u46hv3.png", breakfast),
+    ("گوشت چرخ‌کرده مخلوط", "products/Gemini_Generated_Image_crjfk1crjfk1crjf.png", meat),
+    ("مرغ بدون پوست و استخوان", "products/Gemini_Generated_Image_oxu981oxu981oxu9.png", meat),
+    ("ماکارونی رشته‌ای مانا", "products/prod_rice_1783598614957.png", snacks),
+    ("کره حیوانی میهن ۱۰۰ گرم", "products/prod_cheese_1783598643828.png", dairy),
+    ("خامه صبحانه پگاه", "products/Gemini_Generated_Image_3hpnii3hpnii3hpn.png", breakfast),
+    ("شامپو سر صحت", "products/prod_liquid_soap_1783598966285.png", cleaning),
+    ("کیک براونی شیرین عسل", "products/Gemini_Generated_Image_67xmen67xmen67xm.png", bakery),
+    ("قهوه ترک بن مانو", "products/prod_tea_1783598634428.png", drinks),
+    ("زعفران سحرخیز یک مثقال", "products/prod_tomato_new.jpg", spices),
+    ("سس مایونز مهرام", "products/prod_oil_2_1783598944186.png", spices),
 ]
 
-for idx, name in enumerate(new_product_names):
+for idx, (name, img, cat) in enumerate(new_products_data):
     p = Product.objects.create(
         title=name,
         price=10000 + (idx * 5000),
         discount_price=9000 + (idx * 5000) if idx % 3 == 0 else None,
-        category=random.choice(all_categories),
-        image=new_images[idx % len(new_images)],
+        category=cat,
+        image=img,
         brand="متفرقه",
         is_best_seller=(idx % 4 == 0),
         is_hot_offer=(idx % 5 == 0)
