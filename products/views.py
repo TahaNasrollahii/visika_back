@@ -49,7 +49,7 @@ class ProductListView(generics.ListAPIView):
             
         if brands:
             brand_list = brands.split(',')
-            queryset = queryset.filter(brand__in=brand_list)
+            queryset = queryset.filter(vendor__name__in=brand_list)
             
         if ordering:
             if ordering in ['price', '-price', '-created_at', 'created_at']:
@@ -67,8 +67,8 @@ class BrandListView(APIView):
 
     def get(self, request, *args, **kwargs):
         category_slug = request.query_params.get('category_slug')
-        queryset = Product.objects.exclude(brand='').exclude(brand__isnull=True)
+        queryset = Product.objects.exclude(vendor__name='').exclude(vendor__name__isnull=True)
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
-        brands = queryset.values_list('brand', flat=True).distinct()
+        brands = queryset.values_list('vendor__name', flat=True).distinct()
         return Response(list(brands))

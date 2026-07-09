@@ -58,7 +58,7 @@ class CheckoutView(generics.CreateAPIView):
         delivery_times = request.data.get('delivery_times', {})
 
         for item in cart.items.all():
-            brand = item.product.brand if item.product and item.product.brand else "بدون برند"
+            brand = item.product.vendor.name if item.product and item.product.vendor else "متفرقه"
             delivery_time = delivery_times.get(brand, "")
             
             OrderItem.objects.create(
