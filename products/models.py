@@ -6,6 +6,7 @@ class Category(TimestampedModel):
     slug = models.SlugField(unique=True)
     icon = models.CharField(max_length=50, blank=True)
     color = models.CharField(max_length=50, blank=True)
+    image = models.ImageField(upload_to='categories/', null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Categories"
