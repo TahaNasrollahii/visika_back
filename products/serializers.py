@@ -30,7 +30,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'price', 'discountPrice', 'image', 'badge', 'is_best_seller', 'is_hot_offer', 'is_favorite', 'features', 'brand']
+        fields = ['id', 'title', 'description', 'price', 'discountPrice', 'image', 'badge', 'is_best_seller', 'is_hot_offer', 'is_favorite', 'features', 'brand']
 
     def get_brand(self, obj):
         return obj.vendor.name if obj.vendor else "متفرقه"
