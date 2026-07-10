@@ -22,10 +22,13 @@ def get_or_create_vendor(brand_name):
             phone = f"+98999{random.randint(1000000, 9999999)}"
         user = User.objects.create_user(phone_number=phone, password="password123")
         user.first_name = brand_name
+        user.requested_brand_name = brand_name
         user.role = User.RoleChoices.VENDOR
         user.status = User.StatusChoices.ACTIVE
         user.save()
-        vendor = Vendor.objects.create(user=user, name=brand_name, is_active=True)
+        
+        user.refresh_from_db()
+        vendor = user.vendor
     return vendor
 
 # Create Categories
