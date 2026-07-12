@@ -6,7 +6,7 @@ from users.permissions import IsVendor
 from products.models import Product
 from orders.models import OrderItem
 from users.models import Notification, User
-from .serializers import VendorProductSerializer, VendorOrderSerializer, NotificationSerializer
+from .serializers import VendorProductSerializer, VendorOrderSerializer, NotificationSerializer, VendorNotificationHistorySerializer
 
 class VendorProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsVendor]
@@ -48,3 +48,11 @@ class VendorSendNotificationView(APIView):
             serializer.save(sender=request.user.vendor)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VendorNotificationHistoryView(generics.ListAPIView):
+    permission_classes = [IsVendor]
+    serializer_class = VendorNotificationHistorySerializer
+
+    def get_queryset(self):
+        return Notification.objects.filter(sender=self.request.user.vendor).order_by('-created_at')

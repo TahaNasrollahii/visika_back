@@ -22,4 +22,6 @@ urlpatterns = [
     path('favorites/', views.FavoriteListView.as_view(), name='favorite-list'),
     path('favorites/<int:product_id>/toggle/', views.ToggleFavoriteView.as_view(), name='favorite-toggle'),
     path('notifications/', views.NotificationListView.as_view(), name='user-notifications'),
+    path('notifications/unread-count/', views.UnreadNotificationCountView.as_view(), name='unread-notification-count'),
+    path('notifications/mark-read/', views.MarkNotificationsReadView.as_view(), name='mark-notifications-read'),
 ]
