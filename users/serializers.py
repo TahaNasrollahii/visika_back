@@ -72,6 +72,14 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 from users.models import Address
 
 class AddressSerializer(serializers.ModelSerializer):
+    postal_code = serializers.RegexField(
+        r'^\d+$',
+        allow_blank=True,
+        allow_null=True,
+        required=False,
+        error_messages={"invalid": "کد پستی فقط باید شامل اعداد باشد."},
+    )
+
     class Meta:
         model = Address
         fields = ("id", "title", "detail", "postal_code", "is_default")
