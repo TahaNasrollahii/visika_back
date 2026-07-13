@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from datetime import timedelta
 import environ
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -92,6 +93,13 @@ REST_FRAMEWORK = {
         "otp": "500/hour"
     },
     "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler"
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=3 * 24 * 60 * 60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 # Internationalization
