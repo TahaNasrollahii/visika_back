@@ -5,8 +5,13 @@ from rest_framework.views import APIView
 from users.permissions import IsVendor
 from products.models import Product
 from orders.models import OrderItem
-from users.models import Notification, User
-from .serializers import VendorProductSerializer, VendorOrderSerializer, NotificationSerializer, VendorNotificationHistorySerializer
+from users.models import Notification, User, VendorDeliveryRule
+from shopping.models import BasketRule
+from .serializers import (
+    VendorProductSerializer, VendorOrderSerializer, NotificationSerializer,
+    VendorNotificationHistorySerializer,
+    VendorDeliveryRuleSerializer, BasketRuleSerializer,
+)
 
 class VendorProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsVendor]
@@ -56,3 +61,63 @@ class VendorNotificationHistoryView(generics.ListAPIView):
 
     def get_queryset(self):
         return Notification.objects.filter(sender=self.request.user.vendor).order_by('-created_at')
+
+
+class VendorDeliveryRuleView(APIView):
+    permission_classes = [IsVendor]
+
+    def _get_or_create_rule(self):
+        vendor = self.request.user.vendor
+        rule, _ = VendorDeliveryRule.objects.get_or_create(vendor=vendor)
+        return rule
+
+    def get(self, request):
+        rule = self._get_or_create_rule()
+        serializer = VendorDeliveryRuleSerializer(rule)
+        return Response(serializer.data)
+
+    def put(self, request):
+        rule = self._get_or_create_rule()
+        serializer = VendorDeliveryRuleSerializer(rule, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request):
+        rule = self._get_or_create_rule()
+        serializer = VendorDeliveryRuleSerializer(rule, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VendorBasketRuleView(APIView):
+    permission_classes = [IsVendor]
+
+    def _get_or_create_rule(self):
+        vendor = self.request.user.vendor
+        rule, _ = BasketRule.objects.get_or_create(vendor=vendor)
+        return rule
+
+    def get(self, request):
+        rule = self._get_or_create_rule()
+        serializer = BasketRuleSerializer(rule)
+        return Response(serializer.data)
+
+    def put(self, request):
+        rule = self._get_or_create_rule()
+        serializer = BasketRuleSerializer(rule, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request):
+        rule = self._get_or_create_rule()
+        serializer = BasketRuleSerializer(rule, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

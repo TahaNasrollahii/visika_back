@@ -1,6 +1,7 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.core.exceptions import ValidationError
 from users.permissions import IsCustomer
 from .models import Cart, CartItem, Order, OrderItem
 from .serializers import CartSerializer, CartItemSerializer, OrderSerializer
@@ -48,6 +49,24 @@ class CheckoutView(generics.CreateAPIView):
         cart = Cart.objects.filter(user=request.user).first()
         if not cart or not cart.items.exists():
             return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
+
+        from shopping.models import BasketRule
+        vendor_ids = set(
+            cart.items.exclude(product__vendor__isnull=True)
+            .values_list('product__vendor_id', flat=True)
+        )
+        for vendor_id in vendor_ids:
+            try:
+                rule = BasketRule.objects.get(vendor_id=vendor_id)
+            except BasketRule.DoesNotExist:
+                continue
+            try:
+                rule.validate_basket_conditions(cart)
+            except ValidationError as e:
+                return Response(
+                    {"error": "; ".join(e.messages)},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         order = Order.objects.create(
             user=request.user,

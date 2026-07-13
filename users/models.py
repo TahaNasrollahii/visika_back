@@ -162,3 +162,11 @@ def create_vendor_on_activation(sender, instance, created, **kwargs):
                 description="توضیحات فروشگاه خود را وارد کنید",
                 is_active=True
             )
+
+
+@receiver(post_save, sender=Vendor)
+def create_vendor_rules(sender, instance, created, **kwargs):
+    if created:
+        VendorDeliveryRule.objects.get_or_create(vendor=instance)
+        from shopping.models import BasketRule
+        BasketRule.objects.get_or_create(vendor=instance)

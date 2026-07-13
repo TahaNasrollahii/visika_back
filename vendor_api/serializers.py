@@ -1,8 +1,10 @@
 import json
 from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
 from products.models import Product, ProductFeature
 from orders.models import OrderItem, Order
-from users.models import Notification
+from users.models import Notification, VendorDeliveryRule
+from shopping.models import BasketRule
 
 class VendorProductFeatureSerializer(serializers.ModelSerializer):
     class Meta:
@@ -80,3 +82,31 @@ class VendorNotificationHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = ['id', 'recipient_name', 'recipient_phone', 'message', 'is_read', 'created_at']
+
+
+
+WEEKDAY_FIELDS = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+
+class VendorDeliveryRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VendorDeliveryRule
+        fields = [
+            'preparation_days',
+            'end_of_order_taking_hour',
+            *WEEKDAY_FIELDS,
+        ]
+
+class BasketRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BasketRule
+        fields = ['min_order_price', 'min_order_quantity']
+
+    def validate_min_order_price(self, value):
+        if value is not None and value < 0:
+            raise serializers.ValidationError(_("Minimum order price cannot be negative."))
+        return value
+
+    def validate_min_order_quantity(self, value):
+        if value is not None and value < 0:
+            raise serializers.ValidationError(_("Minimum order quantity cannot be negative."))
+        return value

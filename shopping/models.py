@@ -11,17 +11,19 @@ def english_to_farsi_digits(number):
     return str(number).translate(translation_table)
 
 class BasketRule(TimestampedModel):
-    vendor = models.ForeignKey("users.Vendor", on_delete=models.CASCADE, related_name="rule")
+    vendor = models.OneToOneField("users.Vendor", on_delete=models.CASCADE, related_name="rule")
     
     min_order_price = models.DecimalField(max_digits=12, decimal_places=0, null=True, blank=True)
     min_order_quantity = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("basket rule")
+        verbose_name_plural = _("basket rules")
 
     def __str__(self):
         return f"Rules for {self.vendor.name}"
 
     def check_constraints(self, total_quantity, total_price):
-        errors = []
-        
         if self.min_order_quantity and total_quantity < self.min_order_quantity:
             raise ValidationError(
                 _("For putting order on vendor %(vendor)s, you need to buy at least %(minimum)s %(unit)s") % {
@@ -39,17 +41,25 @@ class BasketRule(TimestampedModel):
                     "unit": _("Tooman")
                 }
             )
-        
-        return errors
 
     def validate_basket_conditions(self, basket):
         vendor_items = basket.items.filter(product__vendor=self.vendor)
         vendor_items_data = (
-            vendor_items.annotate(subtotal=F('quantity') * F('final_price'))
+            vendor_items.annotate(
+                unit_price=models.Case(
+                    models.When(
+                        product__discount_price__isnull=False,
+                        product__discount_price__gt=0,
+                        then=F('product__discount_price'),
+                    ),
+                    default=F('product__price'),
+                    output_field=models.PositiveIntegerField(),
+                )
+            ).annotate(subtotal=F('quantity') * F('unit_price'))
             .aggregate(total_quantity=Sum('quantity'), total_price=Sum('subtotal'))
         )
         
-        return self.check_constraints(
+        self.check_constraints(
             total_quantity=vendor_items_data['total_quantity'] or 0, 
             total_price=vendor_items_data['total_price'] or 0
         )
