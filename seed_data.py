@@ -32,15 +32,15 @@ def get_or_create_vendor(brand_name):
     return vendor
 
 # Create Categories
-dairy = Category.objects.create(title="لبنیات", slug="dairy", icon="🥛", color="bg-blue-100 text-blue-600", image="categories/cat_dairy_1783598508290.png")
-meat = Category.objects.create(title="گوشت و مرغ", slug="meat", icon="🥩", color="bg-red-100 text-red-600", image="categories/cat_meat_1783598519411.png")
-snacks = Category.objects.create(title="تنقلات", slug="snacks", icon="🍫", color="bg-purple-100 text-purple-600", image="categories/cat_snacks_1783598530410.png")
-drinks = Category.objects.create(title="نوشیدنی‌ها", slug="drinks", icon="🥤", color="bg-cyan-100 text-cyan-600", image="categories/cat_drinks_1783598539265.png")
-fruits = Category.objects.create(title="میوه و سبزیجات", slug="fruits", icon="🍎", color="bg-green-100 text-green-600", image="categories/cat_fruits_1783598549345.png")
-bakery = Category.objects.create(title="نان و شیرینی", slug="bakery", icon="🥐", color="bg-yellow-100 text-yellow-600", image="categories/cat_bakery_1783598561618.png")
-breakfast = Category.objects.create(title="صبحانه", slug="breakfast", icon="🍳", color="bg-orange-100 text-orange-600", image="categories/cat_breakfast_1783598572835.png")
-cleaning = Category.objects.create(title="شوینده و بهداشتی", slug="cleaning", icon="🧼", color="bg-teal-100 text-teal-600", image="categories/cat_cleaning_1783598583893.png")
-spices = Category.objects.create(title="چاشنی و ادویه", slug="spices", icon="🧂", color="bg-amber-100 text-amber-600", image="categories/cat_spices_1783598593480.png")
+dairy = Category.objects.create(title="لبنیات", slug="dairy", icon="🥛", color="bg-blue-100 text-blue-600", image="categories/1.jpg")
+meat = Category.objects.create(title="گوشت و مرغ", slug="meat", icon="🥩", color="bg-red-100 text-red-600", image="categories/2.jpg")
+snacks = Category.objects.create(title="تنقلات", slug="snacks", icon="🍫", color="bg-purple-100 text-purple-600", image="categories/3.jpg")
+drinks = Category.objects.create(title="نوشیدنی‌ها", slug="drinks", icon="🥤", color="bg-cyan-100 text-cyan-600", image="categories/4.jpg")
+fruits = Category.objects.create(title="میوه و سبزیجات", slug="fruits", icon="🍎", color="bg-green-100 text-green-600", image="categories/5.jpg")
+bakery = Category.objects.create(title="نان و شیرینی", slug="bakery", icon="🥐", color="bg-yellow-100 text-yellow-600", image="categories/6.jpg")
+breakfast = Category.objects.create(title="صبحانه", slug="breakfast", icon="🍳", color="bg-orange-100 text-orange-600", image="categories/7.jpg")
+cleaning = Category.objects.create(title="شوینده و بهداشتی", slug="cleaning", icon="🧼", color="bg-teal-100 text-teal-600", image="categories/8.jpg")
+spices = Category.objects.create(title="چاشنی و ادویه", slug="spices", icon="🧂", color="bg-amber-100 text-amber-600", image="categories/9.jpg")
 
 
 # Create Products (image field is now directly on Product)
