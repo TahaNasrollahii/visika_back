@@ -23,6 +23,11 @@ CACHES = {
 
 # Security Enhancements
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Celery on Serverless
+# Vercel doesn't support background Celery workers, so tasks must run synchronously
+CELERY_TASK_ALWAYS_EAGER = True
+
 SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
