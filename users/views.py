@@ -7,7 +7,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from django.contrib.auth import get_user_model
 from rest_framework.throttling import ScopedRateThrottle
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from users.serializers import SignUpSerializer, OTPRequestSerializer, OTPLoginSerializer, OTPRegisterSerializer, UserInfoSerializer, UpdateProfileSerializer
 from users.utils import set_tokens_on_cookie
@@ -171,7 +171,6 @@ class UserInfoView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-@method_decorator(csrf_exempt, name='dispatch')
 class LogoutView(APIView):
     permission_classes = [AllowAny]
 

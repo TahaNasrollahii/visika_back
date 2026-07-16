@@ -11,33 +11,33 @@ from users.defaults import (
 )
 
 
-def set_cookie(response: Response, key, value, max_age = REFRESH_TOKEN_LIFETIME * 86400):
+def set_cookie(response: Response, key, value, max_age=REFRESH_TOKEN_LIFETIME * 86400):
     response.set_cookie(
         key=key,
         value=value,
         max_age=max_age,
         httponly=True,
-        secure=False,
-        samesite='Lax',
+        samesite='None',
+        secure=True,
     )
-    # response.set_cookie(
-    #     key=key,
-    #     value=value,
-    #     max_age=max_age,
-    #     httponly=True,
-    #     samesite='None',
-    #     secure=True,
-    # )
 
 
 def set_tokens_on_cookie(response: Response, access_token: str, refresh_token: str):
     set_cookie(response, ACCESS_TOKEN_COOKIE_KEY_NAME, access_token, ACCESS_TOKEN_LIFETIME)
     set_cookie(response, REFRESH_TOKEN_COOKIE_KEY_NAME, refresh_token)
-    
+
 
 def remove_tokens_from_cookie(response: Response):
-    response.delete_cookie(key=ACCESS_TOKEN_COOKIE_KEY_NAME, samesite='Lax')
-    response.delete_cookie(key=REFRESH_TOKEN_COOKIE_KEY_NAME, samesite='Lax')
+    response.delete_cookie(
+        key=ACCESS_TOKEN_COOKIE_KEY_NAME,
+        samesite='None',
+        secure=True,
+    )
+    response.delete_cookie(
+        key=REFRESH_TOKEN_COOKIE_KEY_NAME,
+        samesite='None',
+        secure=True,
+    )
 
 
 def generate_random_password(length=25):
