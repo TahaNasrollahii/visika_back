@@ -3,6 +3,11 @@ from .base import *
 # Production settings overrides
 DEBUG = False
 
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
+
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Database
 DATABASES = {
     'default': env.db('DATABASE_URL', default='postgres://user:pass@localhost:5432/db'),
@@ -30,4 +35,5 @@ SECURE_HSTS_PRELOAD = True
 
 # CORS Setup
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
+CORS_ALLOW_ALL_ORIGINS = env.bool('CORS_ALLOW_ALL_ORIGINS', default=False)
 CORS_ALLOW_CREDENTIALS = True
