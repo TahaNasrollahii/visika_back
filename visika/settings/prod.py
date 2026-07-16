@@ -24,6 +24,9 @@ CACHES = {
 # Security Enhancements
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Vercel Serverless File System is Read-Only except for /tmp
+MEDIA_ROOT = '/tmp/media'
+
 # Celery on Serverless
 # Vercel doesn't support background Celery workers, so tasks must run synchronously
 CELERY_TASK_ALWAYS_EAGER = True
