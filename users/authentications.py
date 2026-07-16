@@ -24,6 +24,9 @@ class CookieJWTAuthentication(JWTAuthentication):
         """
         Enforce CSRF validation for cookie based authentication.
         """
+        if request.path.rstrip('/') == '/users/logout':
+            return
+            
         check = CSRFCheck(get_response=lambda req: None)
         check.process_request(request)
         reason = check.process_view(request, None, (), {})
