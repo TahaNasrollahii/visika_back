@@ -6,7 +6,7 @@ DEBUG = False
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Database
 DATABASES = {
@@ -42,9 +42,3 @@ SECURE_HSTS_PRELOAD = True
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[])
 CORS_ALLOW_ALL_ORIGINS = env.bool('CORS_ALLOW_ALL_ORIGINS', default=False)
 CORS_ALLOW_CREDENTIALS = True
-
-# CSRF trusted origins for admin panel access on Vercel
-CSRF_TRUSTED_ORIGINS = [
-    "https://visika-back.vercel.app",
-    "https://*.vercel.app",
-]
