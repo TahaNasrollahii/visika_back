@@ -1,4 +1,4 @@
-window.addEventListener("load", (e) => {
+window.addEventListener("load", () => {
 	fileInputUpdatePath();
 
 	dateTimeShortcutsOverlay();
@@ -14,7 +14,23 @@ window.addEventListener("load", (e) => {
 	tabNavigation();
 
 	scrollSidebarNav();
+
+	crispyFormset();
 });
+
+function getCurrentTab() {
+	const fragment = window.location.hash?.replace("#", "");
+
+	if (!fragment) {
+		return null;
+	}
+
+	if (!document.getElementById(`${fragment}-group`)) {
+		return null;
+	}
+
+	return fragment;
+}
 
 /*************************************************************
  * Switch theme
@@ -22,6 +38,25 @@ window.addEventListener("load", (e) => {
 function theme(defaultTheme = "auto") {
 	return {
 		sidebarWidth: localStorage.getItem("sidebarWidth") || 288,
+		sidebarOpen() {
+			if (window.innerWidth <= 1280) {
+				return false;
+			} else {
+				const sidebarOpenValue = localStorage.getItem("sidebarOpen");
+
+				if (sidebarOpenValue === null) {
+					return true;
+				}
+				return sidebarOpenValue !== "0";
+			}
+		},
+		sidebarToggle() {
+			this.sidebarOpen = !this.sidebarOpen;
+
+			if (window.innerWidth > 1280) {
+				localStorage.setItem("sidebarOpen", this.sidebarOpen ? "1" : "0");
+			}
+		},
 		openModal: false,
 		filterOpen: false,
 		openAllApplications: false,
@@ -67,6 +102,14 @@ function theme(defaultTheme = "auto") {
 			this.adminTheme = theme;
 		},
 		themeBindings: {
+			["x-resize.window"]() {
+				if (window.innerWidth <= 1280) {
+					this.sidebarOpen = false;
+				} else {
+					this.sidebarOpen =
+						localStorage.getItem("sidebarOpen") === "0" ? false : true;
+				}
+			},
 			["x-bind:class"]() {
 				if (
 					this.adminTheme === "dark" ||
@@ -83,6 +126,38 @@ function theme(defaultTheme = "auto") {
 				return "";
 			},
 			["x-on:keydown.window"](event) {
+				const isInput =
+					document.activeElement.tagName.toLowerCase() === "input" ||
+					document.activeElement.tagName.toLowerCase() === "textarea" ||
+					document.activeElement.isContentEditable;
+
+				if (isInput) {
+					return;
+				}
+
+				if (!event.metaKey && !event.ctrlKey && event.key === "[") {
+					event.preventDefault();
+					this.sidebarToggle();
+				}
+
+				if (!event.metaKey && !event.ctrlKey && event.key === "f") {
+					const filterOpenButton = document.querySelector(
+						".filter-open-button",
+					);
+
+					if (filterOpenButton) {
+						this.filterOpen = !this.filterOpen;
+					}
+				}
+
+				if (!event.metaKey && !event.ctrlKey && event.key === "c") {
+					const addLink = document.querySelector(".addlink");
+
+					if (addLink) {
+						addLink.click();
+					}
+				}
+
 				if ((event.metaKey || event.ctrlKey) && event.key === "e") {
 					event.preventDefault();
 
@@ -236,45 +311,6 @@ function searchForm() {
 				event.preventDefault();
 				this.$refs.searchInput.focus();
 			}
-		},
-	};
-}
-
-/*************************************************************
- * Search dropdown
- *************************************************************/
-function searchDropdown() {
-	return {
-		openSearchResults: false,
-		currentIndex: 0,
-		applyShortcut(event) {
-			if (
-				event.key === "t" &&
-				document.activeElement.tagName.toLowerCase() !== "input" &&
-				document.activeElement.tagName.toLowerCase() !== "textarea" &&
-				!document.activeElement.isContentEditable
-			) {
-				event.preventDefault();
-				this.$refs.searchInput.focus();
-			}
-		},
-		nextItem() {
-			if (this.currentIndex < this.maxItem()) {
-				this.currentIndex++;
-			}
-		},
-		prevItem() {
-			if (this.currentIndex > 1) {
-				this.currentIndex--;
-			}
-		},
-		maxItem() {
-			return document.getElementById("search-results").querySelectorAll("li")
-				.length;
-		},
-		selectItem() {
-			const href = this.items[this.currentIndex - 1].querySelector("a").href;
-			window.location = href;
 		},
 	};
 }
@@ -551,9 +587,10 @@ function dateTimeShortcutsOverlay() {
 	const observer = new MutationObserver((mutations) => {
 		for (const mutationRecord of mutations) {
 			const display = mutationRecord.target.style.display;
+			const hasOpenAttribute = mutationRecord.target.hasAttribute("open");
 			const overlay = document.getElementById("modal-overlay");
 
-			if (display === "block") {
+			if (display === "block" || hasOpenAttribute) {
 				overlay.style.display = "block";
 			} else {
 				overlay.style.display = "none";
@@ -565,7 +602,7 @@ function dateTimeShortcutsOverlay() {
 		for (const target of document.querySelectorAll(".calendarbox, .clockbox")) {
 			observer.observe(target, {
 				attributes: true,
-				attributeFilter: ["style"],
+				attributeFilter: ["style", "open"],
 			});
 		}
 	};
@@ -1106,16 +1143,125 @@ document.addEventListener("htmx:afterSettle", (e) => {
 	});
 });
 
-function getCurrentTab() {
-	const fragment = window.location.hash?.replace("#", "");
+/*************************************************************
+ * Crispy formset
+ *************************************************************/
+function crispyFormsetReindex(formsetId) {
+	document
+		.querySelectorAll(`#${formsetId} .dynamic-form`)
+		.forEach((row, index) => {
+			const newIndex =
+				document.querySelectorAll(`#${formsetId} .original-form`).length +
+				index;
 
-	if (!fragment) {
-		return null;
+			["id", "name", "for"].forEach((attr) => {
+				row.querySelectorAll(`[${attr}]`).forEach((el) => {
+					const val = el.getAttribute(attr);
+
+					if (val) {
+						el.setAttribute(attr, val.replace(/-\d+-/g, `-${newIndex}-`));
+					}
+				});
+			});
+		});
+}
+
+function crispyFormsetDelete(target) {
+	const rows = target
+		? target.querySelectorAll(".crispy-formset-delete")
+		: document.querySelectorAll(".crispy-formset-delete");
+
+	rows.forEach((el) => {
+		el.addEventListener("click", () => {
+			const formsetId = el.dataset.formsetId;
+			const formTotalEl = document.querySelector(
+				`#${formsetId} input[name*="TOTAL_FORMS"]`,
+			);
+			const formMinEl = document.querySelector(
+				`#${formsetId} input[name*="MIN_NUM_FORMS"]`,
+			);
+			const totalForms = parseInt(formTotalEl.value, 10);
+			const minNumForms = parseInt(formMinEl.value, 10);
+
+			if (totalForms <= minNumForms) {
+				return;
+			}
+
+			const rowToDelete = el.closest(".dynamic-form");
+
+			rowToDelete.remove();
+			formTotalEl.value = formTotalEl.value - 1;
+
+			crispyFormsetReindex(formsetId);
+			crispyFormsetToggleAdd(formsetId);
+		});
+	});
+}
+
+function crispyFormsetAdd(target) {
+	const formsetId = target.dataset.formsetId;
+	const formTotalEl = document.querySelector(
+		`#${formsetId} input[name*="TOTAL_FORMS"]`,
+	);
+	const formCount = parseInt(formTotalEl.value, 10);
+
+	const newForm = document
+		.querySelector(`#${formsetId} .empty-form`)
+		.cloneNode(true);
+
+	newForm.classList.remove("empty-form", "hidden");
+	newForm.classList.add("dynamic-form");
+	newForm.innerHTML = newForm.innerHTML.replaceAll(/__prefix__/g, formCount);
+
+	document.getElementById(`${formsetId}-rows`).insertBefore(newForm, null);
+
+	formTotalEl.value = formCount + 1;
+
+	newForm.dispatchEvent(
+		new CustomEvent("formset:added", {
+			bubbles: true,
+		}),
+	);
+
+	crispyFormsetToggleAdd(formsetId);
+}
+
+function crispyFormsetToggleAdd(formsetId) {
+	const totalForms = parseInt(
+		document.querySelector(`#${formsetId} input[name*="TOTAL_FORMS"]`).value,
+		10,
+	);
+
+	const maxNumForms = parseInt(
+		document.querySelector(`#${formsetId} input[name*="MAX_NUM_FORMS"]`).value,
+		10,
+	);
+
+	if (totalForms >= maxNumForms) {
+		document
+			.getElementById(`${formsetId}-add-row-wrapper`)
+			.classList.add("hidden");
+	} else {
+		document
+			.getElementById(`${formsetId}-add-row-wrapper`)
+			.classList.remove("hidden");
 	}
+}
 
-	if (!document.getElementById(`${fragment}-group`)) {
-		return null;
-	}
+function crispyFormset() {
+	document
+		.querySelectorAll(".crispy-formset-add")
+		.forEach((formsetAddButton) => {
+			crispyFormsetToggleAdd(formsetAddButton.dataset.formsetId);
 
-	return fragment;
+			formsetAddButton.addEventListener("click", () => {
+				crispyFormsetAdd(formsetAddButton);
+			});
+		});
+
+	crispyFormsetDelete();
+
+	document.addEventListener("formset:added", (event) => {
+		crispyFormsetDelete(event.target);
+	});
 }
