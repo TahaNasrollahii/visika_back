@@ -20,6 +20,13 @@ class OTPService:
         """
         from django.conf import settings
         
+        if not getattr(settings, "FARAZ_SMS_API_KEY", ""):
+            # Fallback for when SMS keys are not configured in Vercel
+            otp = "1234"
+            cache.set(f"otp_{phone_number}", otp, timeout=OTP_EXPIRY_SECONDS)
+            print(f"MOCK SMS (No API Key): OTP for {phone_number} is fixed to 1234")
+            return
+            
         otp = OTPService.generate_otp()
         cache.set(f"otp_{phone_number}", otp, timeout=OTP_EXPIRY_SECONDS)
         
@@ -27,7 +34,6 @@ class OTPService:
             print(f"\n" + "="*50)
             print(f"DEVELOPMENT MODE: OTP for {phone_number} is: {otp}")
             print("="*50 + "\n")
-            # return  # commented out to test SMS sending in dev mode
             
         send_otp_sms.delay(phone_number, otp)
 
