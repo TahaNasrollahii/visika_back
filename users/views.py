@@ -166,23 +166,23 @@ class UserInfoView(APIView):
         return Response(UserInfoSerializer(user).data)
 
     def patch(self, request):
-        try:
-            serializer = UpdateProfileSerializer(request.user, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            import traceback
-            return Response({"detail": str(e), "traceback": traceback.format_exc()}, status=500)
+        serializer = UpdateProfileSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class LogoutView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        response = Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
-        from users.utils import remove_tokens_from_cookie
-        remove_tokens_from_cookie(response)
-        return response
+        try:
+            response = Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+            from users.utils import remove_tokens_from_cookie
+            remove_tokens_from_cookie(response)
+            return response
+        except Exception as e:
+            import traceback
+            return Response({"detail": str(e), "traceback": traceback.format_exc()}, status=500)
 
 from products.models import Product
 from products.serializers import ProductSerializer
