@@ -87,6 +87,11 @@ class CheckoutView(generics.CreateAPIView):
                 price=item.product.discount_price if item.product.discount_price else item.product.price,
                 delivery_time=delivery_time
             )
+            
+            # Reduce product stock
+            if item.product.stock > 0:
+                item.product.stock = max(0, item.product.stock - item.quantity)
+                item.product.save()
         
         cart.items.all().delete()
         

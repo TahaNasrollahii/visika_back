@@ -32,6 +32,7 @@ class ProductListView(generics.ListAPIView):
         has_discount = self.request.query_params.get('has_discount')
         brands = self.request.query_params.get('brands')
         ordering = self.request.query_params.get('ordering')
+        q = self.request.query_params.get('q')
 
         if is_best_seller == 'true':
             queryset = queryset.filter(is_best_seller=True)
@@ -39,6 +40,8 @@ class ProductListView(generics.ListAPIView):
             queryset = queryset.filter(is_hot_offer=True)
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
+        if q:
+            queryset = queryset.filter(title__icontains=q)
             
         if min_price and min_price.isdigit():
             queryset = queryset.filter(price__gte=int(min_price))
