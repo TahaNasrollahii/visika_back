@@ -31,12 +31,10 @@ def remove_tokens_from_cookie(response: Response):
     response.delete_cookie(
         key=ACCESS_TOKEN_COOKIE_KEY_NAME,
         samesite='None',
-        secure=True,
     )
     response.delete_cookie(
         key=REFRESH_TOKEN_COOKIE_KEY_NAME,
         samesite='None',
-        secure=True,
     )
 
 
