@@ -106,3 +106,54 @@ class OrderRetrieveView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
+
+
+from rest_framework.views import APIView
+from users.models import Vendor, VendorDeliveryRule
+
+class VendorDeliveryInfoView(APIView):
+    """
+    Public endpoint for customers to fetch delivery rules for specific vendors.
+    Query params: ?brands=BrandA,BrandB
+    Returns a dict mapping vendor name -> delivery rule info.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        brands_param = request.query_params.get('brands', '')
+        if not brands_param:
+            return Response({}, status=status.HTTP_200_OK)
+
+        brand_names = [b.strip() for b in brands_param.split(',') if b.strip()]
+        vendors = Vendor.objects.filter(name__in=brand_names).select_related('delivery_rule')
+
+        result = {}
+        for vendor in vendors:
+            try:
+                rule = vendor.delivery_rule
+                result[vendor.name] = {
+                    'preparation_days': rule.preparation_days,
+                    'end_of_order_taking_hour': rule.end_of_order_taking_hour,
+                    'saturday': rule.saturday,
+                    'sunday': rule.sunday,
+                    'monday': rule.monday,
+                    'tuesday': rule.tuesday,
+                    'wednesday': rule.wednesday,
+                    'thursday': rule.thursday,
+                    'friday': rule.friday,
+                }
+            except VendorDeliveryRule.DoesNotExist:
+                # Vendor has no delivery rule — use defaults
+                result[vendor.name] = {
+                    'preparation_days': 2,
+                    'end_of_order_taking_hour': 15,
+                    'saturday': True,
+                    'sunday': True,
+                    'monday': True,
+                    'tuesday': True,
+                    'wednesday': True,
+                    'thursday': True,
+                    'friday': False,
+                }
+
+        return Response(result, status=status.HTTP_200_OK)

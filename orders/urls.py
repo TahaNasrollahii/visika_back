@@ -6,6 +6,7 @@ urlpatterns = [
     path('cart/items/', views.CartItemAddView.as_view(), name='cart-item-add'),
     path('cart/items/<int:pk>/', views.CartItemUpdateDeleteView.as_view(), name='cart-item-detail'),
     path('checkout/', views.CheckoutView.as_view(), name='checkout'),
+    path('delivery-info/', views.VendorDeliveryInfoView.as_view(), name='vendor-delivery-info'),
     path('', views.OrderListView.as_view(), name='order-list'),
     path('<int:pk>/', views.OrderRetrieveView.as_view(), name='order-detail'),
 ]

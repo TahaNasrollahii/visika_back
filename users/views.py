@@ -160,7 +160,7 @@ class UserInfoView(APIView):
         user = (
             User.objects.prefetch_related("groups")
             .only("id", "phone_number", "first_name", "last_name", "email", "national_id",
-                "status", "role", "is_phone_verified")
+                "status", "role", "is_phone_verified", "avatar")
             .get(id=request.user.id)
         )
         return Response(UserInfoSerializer(user).data)
