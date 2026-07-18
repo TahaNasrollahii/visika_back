@@ -166,10 +166,14 @@ class UserInfoView(APIView):
         return Response(UserInfoSerializer(user).data)
 
     def patch(self, request):
-        serializer = UpdateProfileSerializer(request.user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            serializer = UpdateProfileSerializer(request.user, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            import traceback
+            return Response({"detail": str(e), "traceback": traceback.format_exc()}, status=500)
 
 class LogoutView(APIView):
     permission_classes = [AllowAny]
