@@ -26,19 +26,19 @@ class BasketRule(TimestampedModel):
     def check_constraints(self, total_quantity, total_price):
         if self.min_order_quantity and total_quantity < self.min_order_quantity:
             raise ValidationError(
-                _("For putting order on vendor %(vendor)s, you need to buy at least %(minimum)s %(unit)s") % {
+                _("برای ثبت سفارش از فروشنده %(vendor)s، حداقل خرید شما باید %(minimum)s %(unit)s باشد.") % {
                     "vendor": self.vendor.name,
                     "minimum": english_to_farsi_digits(self.min_order_quantity),
-                    "unit": _("Number")
+                    "unit": _("عدد")
                 }
             )
         
         if self.min_order_price and total_price < self.min_order_price:
             raise ValidationError(
-                _("For putting order on vendor %(vendor)s, you need to buy at least %(minimum)s %(unit)s") % {
+                _("برای ثبت سفارش از فروشنده %(vendor)s، حداقل خرید شما باید %(minimum)s %(unit)s باشد.") % {
                     "vendor": self.vendor.name,
                     "minimum": english_to_farsi_digits(self.min_order_price),
-                    "unit": _("Tooman")
+                    "unit": _("تومان")
                 }
             )
 
